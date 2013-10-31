@@ -1,0 +1,5 @@
+abiturient2/local_settings.py
+abiturient2/private_settings.py
+*.db
+*.pyc
+.idea

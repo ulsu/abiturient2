@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+{% for a in applications %}
+<tr><td>{{ a.LastName }}</td><td>{{ a.FirstName }}</td><td>{{ a.MiddleName }}</td><td><a href="/application/edit/{{ a.id }}/">Редактировать</a></td></tr>
+{% endfor %}
+</table>
+<a href="/application/add/">Добавить</a>
+{% endblock %}
