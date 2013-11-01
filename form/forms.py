@@ -24,12 +24,10 @@ class ExamForm(ModelForm):
         model = Exam
         exclude = ['application']
 
+
     def __init__(self, *args, **kwargs):
         super(ExamForm, self).__init__(*args, **kwargs)
         for f in self.fields:
             self.fields[f].empty_label = ''
 
-
-
 ExamFormSet = inlineformset_factory(Application, Exam, form=ExamForm, extra=1)
-

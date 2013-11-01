@@ -5,41 +5,33 @@
         {% if id %}<input type="hidden" name="id" value="{{ id }}" />{% endif %}
         {% csrf_token %}
 
-        <div id="form" class="entry">
-            {% for form in exam_formset.forms %}
-            <div id="{{ form.prefix }}-row" style="padding-bottom:6px; border-bottom:1px dotted #ccc; margin-bottom:6px;">
-                {{ form.Number.label_tag }}
-                {{ form.Number }}<br />
-                {{ form.ExamName.label_tag }}
-                {{ form.ExamName }}<br />
-                {{ form.Mark.label_tag }}
-                {{ form.Mark }}<br />
-                {{ form.DocSer.label_tag }}
-                {{ form.DocSer }}<br />
-                {{ form.DocNum.label_tag }}
-                {{ form.DocNum }}<br />
-                {{ form.id }}<br />
+        <div id="exam_formset" class="entry" data-formset-prefix="{{ exam_formset.prefix }}">
+            {{ exam_formset.management_form }}
+            <div data-formset-body>
+                {% for form in exam_formset.forms %}
+                    {% include 'form/exam_formset_item.html' %}
+                {% endfor %}
             </div>
-            {% endfor %}
-
-            <p>
-                {{ exam_formset.management_form }}
-            </p>
+            <script type="form-template" data-formset-empty-form>
+            {% with form=exam_formset.empty_form %}
+                {% include 'form/exam_formset_item.html' %}
+            {% endwith %}
+            </script>
+            <input type="button" value="Add another" data-formset-add>
         </div>
         <input type="submit" value="Отправить">
     </form>
 {% endblock %}
 
 {% block js %}
-<script src="{{ STATIC_URL }}js/jquery-1.3.2.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.min.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $('#form div').formset({
-                extraClasses: ['row1', 'row2', 'row3']
-            })
-        })
-    </script>
+<script>
+    $(function(){
+        $("#exam_formset").formset();
+    });
+</script>
+
 {% endblock %}
 
 {% block title %}Basic Formset (Table layout){% endblock %}
@@ -47,21 +39,17 @@
 
 {% block css %}
 <style type="text/css">
-    .add-row {
-        padding-left:18px;
-        background:url({{ STATIC_URL }}images/add.png) no-repeat left center;
+    span.hidden{
+        display: none;
     }
-    .delete-row {
-        float:right;
-        display:block;
-        margin:5px 0 0 5px;
-        text-indent:-6000px;
-        background:url({{ STATIC_URL }}images/delete.png) no-repeat left center;
-        width:16px;
-        height:16px;
+
+    div.data-formset-form{
+        padding: 20px;
     }
-    tr.row1 td { background-color: #f9f9f9; }
-    tr.row2 td { background-color: #f3f3f3; }
-    tr.row3 td { background-color: #ededed; }
+
+    a.data-formset-delete-button{
+        color: red;
+        cursor: pointer;
+    }
 </style>
 {% endblock %}

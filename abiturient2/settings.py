@@ -106,7 +106,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'main',
     'form',
-    'dynamic_formset',
 )
 
 # A sample logging configuration. The only tangible logging
