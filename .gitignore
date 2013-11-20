@@ -3,3 +3,4 @@ abiturient2/private_settings.py
 *.db
 *.pyc
 .idea
+static

@@ -2,10 +2,21 @@
 <html>
 <head>
     <title></title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}packages/bootstrap/css/bootstrap.min.css">
     {% block css %}{% endblock %}
+    <style type="text/css">
+        #main_content{
+            width: 800px;
+            margin: 50px auto 0;
+        }
+    </style>
 </head>
 <body>
-{% block content %}{% endblock %}
+<div id="main_content">
+    {% block content %}{% endblock %}
+</div>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}packages/bootstrap/js/bootstrap.min.js"></script>
 {% block js %}{% endblock %}
 </body>
 
