@@ -1,12 +1,10 @@
 <script type="text/javascript">
-    var {{ values }} = [
-        {% for c in choices %}
-        {
-            'pk':{{c.id}},
-            'display':{{c.name}}
-        }{% if forloop.revcounter0 %},{% endif %}
-        {% endfor %}
-    ];
+        var {{ values_var }} = [
+            {% for value, label in choices %}{
+                'value':"{{value}}",
+                'label':"{{label}}"
+            }{% if forloop.revcounter %},{% endif %}{% endfor %}
+        ];
 </script>
-<input type="text"{{ display_attrs }} />
+<input type="text"{{ display_attrs }} value="{{ display_value }}" />
 <input type="hidden" {{ final_attrs }} />
