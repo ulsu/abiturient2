@@ -103,16 +103,16 @@ class Application(models.Model):
     RegRegion = models.ForeignKey(Region, blank=True, null=True)
     RegDistrict = models.ForeignKey(District, blank=True, null=True)
     RegCity = models.ForeignKey(City, blank=True, null=True)
-    RegStreet = models.ForeignKey(Street, blank=True, null=True)
+    RegStreet = models.ForeignKey(Street, blank=True, null=True, related_name='+')
     RegHouse = models.CharField(max_length=255, blank=True, null=True)
     RegApartment = models.CharField(max_length=255, blank=True, null=True)
     RegZipcode = models.IntegerField(max_length=6, blank=True, null=True)
 
     #Ulyanovsk-city only
-    Street = models.ForeignKey(Street, blank=True, null=True)
-    PrpHouse = models.CharField(max_length=255, blank=True, null=True)
-    PrpApartment = models.CharField(max_length=255, blank=True, null=True)
-    PrpZipcode = models.IntegerField(max_length=6, blank=True, null=True)
+    ResStreet = models.ForeignKey(Street, blank=True, null=True, related_name='+')
+    ResHouse = models.CharField(max_length=255, blank=True, null=True)
+    ResApartment = models.CharField(max_length=255, blank=True, null=True)
+    ResZipcode = models.IntegerField(max_length=6, blank=True, null=True)
 
     def __unicode__(self):
         return "%s %s %s" % (self.LastName, self.FirstName, self.MiddleName)

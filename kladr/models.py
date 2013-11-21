@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from form.models import Application
 
 
 class Country(models.Model):
     title = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.title
 
 
 class Region(models.Model):
@@ -13,6 +15,8 @@ class Region(models.Model):
     short_type = models.CharField(max_length=255)
     zip_code = models.SmallIntegerField(max_length=6)
 
+    def __unicode__(self):
+        return self.title
 
 class District(models.Model):
     title = models.CharField(max_length=255)
@@ -22,6 +26,10 @@ class District(models.Model):
 
     region = models.ForeignKey(Region, related_name='districts')
 
+    def __unicode__(self):
+        return self.title
+
+
 
 class City(models.Model):
     title = models.CharField(max_length=255)
@@ -30,7 +38,10 @@ class City(models.Model):
     zip_code = models.SmallIntegerField(max_length=6, null=True, blank=True)
 
     region = models.ForeignKey(Region, related_name='cities')
-    district = models.ForeignKey(Region, related_name='+cities', null=True, blank=True)
+    district = models.ForeignKey(District, related_name='cities', null=True, blank=True)
+
+    def __unicode__(self):
+        return self.title
 
 
 class Street(models.Model):
@@ -40,12 +51,11 @@ class Street(models.Model):
     zip_code = models.SmallIntegerField(max_length=6, null=True, blank=True)
 
     region = models.ForeignKey(Region, related_name='streets')
-    district = models.ForeignKey(Region, related_name='+streets', null=True, blank=True)
+    district = models.ForeignKey(District, related_name='streets', null=True, blank=True)
     city = models.ForeignKey(City, related_name='streets')
 
-
-class ResidenceAddress(models.Model):
-    application = models.OneToOneField(Application)
+    def __unicode__(self):
+        return self.title
 
 
 

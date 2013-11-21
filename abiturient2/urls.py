@@ -4,7 +4,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^application/', include('form.urls')),
-    url(r'^chained/', include('chained_selects.urls')),
     url(r'^kladr/', include('kladr.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )

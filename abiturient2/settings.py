@@ -106,7 +106,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'main',
     'form',
-    'chained_selects',
     'kladr',
 )
 

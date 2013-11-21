@@ -1,0 +1,12 @@
+<script type="text/javascript">
+    var {{ values }} = [
+        {% for c in choices %}
+        {
+            'pk':{{c.id}},
+            'display':{{c.name}}
+        }{% if forloop.revcounter0 %},{% endif %}
+        {% endfor %}
+    ];
+</script>
+<input type="text"{{ display_attrs }} />
+<input type="hidden" {{ final_attrs }} />

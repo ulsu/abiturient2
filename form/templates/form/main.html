@@ -10,10 +10,10 @@
     <form action="/application/save/" method="POST" id="contacts_form">
     <div class="tab-content">
         <div class="tab-pane active" id="personal">
-            {{ form.as_p }}
+            {{ forms.personal_form.as_p }}
         </div>
         <div class="tab-pane" id="registration">
-            <p>Nothing to show</p>
+            {{ forms.residence_form.as_p }}
         </div>
         <div class="tab-pane" id="education">
             <div id="exam_formset" class="entry" data-formset-prefix="{{ exam_formset.prefix }}">
@@ -44,6 +44,7 @@
 
 {% block js %}
 <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
+<script src="{{ STATIC_URL }}js/delayed_fill.js"></script>
 <script>
     $(function(){
         $("#exam_formset").formset();
