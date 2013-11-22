@@ -12,6 +12,8 @@ def kladr(request, action, value, parent):
         qs = get_districts(value)
     elif action == 'cities':
         qs = get_cities(value, parent)
+    elif action == 'streets':
+        qs = get_streets(value, parent)
     else:
         raise Http404
     results = list(qs)
@@ -32,3 +34,7 @@ def get_cities(value, parent):
     else:
         district = get_object_or_404(District, pk=value)
         return district.cities.all()
+
+def get_streets(value, parent):
+    city = get_object_or_404(City, pk=value)
+    return Street.objects.filter(city=city)

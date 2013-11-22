@@ -44,6 +44,13 @@ class ResidenceApplicationForm(ModelForm):
             action='cities',
             accept_empty=True,
             empty_label='',
+            ),
+
+            'RegStreet': KladrTextWidget(
+            parent_name='RegCity',
+            action='streets',
+            accept_empty=False,
+            empty_label='',
             )
         }
 
@@ -60,6 +67,12 @@ class ResidenceApplicationForm(ModelForm):
             district=self.instance.RegDistrict
         )
 
+        self.fields['RegStreet'].queryset = Street.objects.filter(
+            region=self.instance.RegRegion,
+            district=self.instance.RegDistrict,
+            city=self.instance.RegCity
+        )
+
     def clean(self):
         super(ResidenceApplicationForm, self).clean()
         if 'RegDistrict' in self._errors:
@@ -73,6 +86,12 @@ class ResidenceApplicationForm(ModelForm):
             self.initial['RegCity'] = city.id
             self.cleaned_data['RegCity'] = city
             del self._errors['RegCity']
+
+        if 'RegStreet' in self._errors:
+            city = Street.objects.get(pk=self.data['RegStreet'])
+            self.initial['RegStreet'] = city.id
+            self.cleaned_data['RegStreet'] = city
+            del self._errors['RegStreet']
 
         return self.cleaned_data
 
