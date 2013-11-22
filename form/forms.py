@@ -52,7 +52,7 @@ class ResidenceApplicationForm(ModelForm):
         for f in self.fields:
             self.fields[f].empty_label = ''
 
-        self.fields['RegDistrict'].queryset = District.objects.filter(region=self.instance.RegRegion)
+        self.fields['RegDistrict'].queryset = District.objects.filter(region=self.initial['RegRegion'])
         self.fields['RegDistrict'].empty_label = 'Нет'
 
         self.fields['RegCity'].queryset = City.objects.filter(
@@ -60,6 +60,21 @@ class ResidenceApplicationForm(ModelForm):
             district=self.instance.RegDistrict
         )
 
+    def clean(self):
+        super(ResidenceApplicationForm, self).clean()
+        if 'RegDistrict' in self._errors:
+            district = District.objects.get(pk=self.data['RegDistrict'])
+            self.initial['RegDistrict'] = district.id
+            self.cleaned_data['RegDistrict'] = district
+            del self._errors['RegDistrict']
+
+        if 'RegCity' in self._errors:
+            city = City.objects.get(pk=self.data['RegCity'])
+            self.initial['RegCity'] = city.id
+            self.cleaned_data['RegCity'] = city
+            del self._errors['RegCity']
+
+        return self.cleaned_data
 
 class ExamForm(ModelForm):
     class Meta:

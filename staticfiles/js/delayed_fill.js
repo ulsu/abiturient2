@@ -6,7 +6,7 @@
             target.find('option:first').attr('selected', 'selected');
         }
 
-        function fill_field(target, label, url, pk, parent_pk, initial_value) {
+        function fill_field(target, label, url, pk, parent_pk) {
             var value = (pk)? pk : 0;
             $.getJSON(url + value + '/' + parent_pk + '/', function(j) {
                 var options = '<option value="">' + label + '</option>';
@@ -28,7 +28,10 @@
                 url = $(this).data('url'),
                 empty_label = $(this).data('empty-label'),
                 accept_empty = $(this).data('accept-empty') == 'True';
+
             $parent.on('change', function() {
+                console.log('Changed ' + this.id + 'value');
+                console.log('Its value is ' + this.value +' now');
                 var parent_disabled = this.disabled == true;
                 var pk = $(this).val();
                 var parent_pk = 0;
@@ -40,14 +43,12 @@
                 if (!accept_empty && (!pk || pk == '')) {
                     fill_empty($target, empty_label);
                     $target.attr('disabled', true);
-                    $target.trigger('change');
                 } else {
-                    console.log('filling ' + $target.attr('id'));
-                    console.log('value: ' + pk);
-                    $target.attr('disabled', false);
                     fill_field($target, empty_label, url, pk, parent_pk);
-                    $target.trigger('change');
+                    $target.attr('disabled', false);
+                    $target.val('');
                 }
+                $target.trigger('change');
             });
         });
     });
@@ -125,6 +126,8 @@
             };
 
             $parent.on('change', function() {
+                console.log('Changed ' + this.id + 'value');
+                console.log('Value is ' + this.value +' now');
                 var parent_disabled = this.disabled == true;
                 var pk = $(this).val();
                 var parent_pk = 0;
@@ -139,9 +142,10 @@
                 } else {
                     fill_field($target, empty_label, url, pk, parent_pk, autocomplete_values);
                     $target.attr('disabled', false);
+                    console.log('My value is ' + $target.val() + ' now');
                 }
-                $target.trigger('change');
                 clean_fields($target, $hidden);
+                $target.trigger('change');
             });
         });
     });
