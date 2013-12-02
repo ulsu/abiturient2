@@ -107,6 +107,7 @@ INSTALLED_APPS = (
     'main',
     'form',
     'kladr',
+    'education',
 )
 
 # A sample logging configuration. The only tangible logging
