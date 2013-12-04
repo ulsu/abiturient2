@@ -3,9 +3,29 @@ from django.template import loader, Context, RequestContext, Template
 from django.http import HttpResponse, Http404
 from models import *
 from forms import *
+from education.forms import EducationFormSet
 
 
-def get_forms(instance=None, POST=None):
+def get_forms(instance, POST):
+    return {
+        'personal_form': PersonalApplicationForm(POST, instance=instance),
+        'residence_form': ResidenceApplicationForm(POST, instance=instance)
+    }
+
+
+def get_formsets(instance, POST):
+    return {
+        'exam_formset': ExamFormSet(POST, instance=instance),
+        'edu_formset': EducationFormSet(POST, instance=instance)
+    }
+
+def forms_are_valid(forms):
+    for f in forms:
+        if not forms[f].is_valid:
+            return False
+    return True
+
+def display_form(request, id=None, instance=None, POST=None):
     args = []
     kwargs = {}
     if instance is not None:
@@ -14,29 +34,21 @@ def get_forms(instance=None, POST=None):
     if POST is not None:
         args.append(POST)
 
+    context = {}
+    if id is not None:
+        context.update({'id': id})
 
-    return {
-        'personal_form': PersonalApplicationForm(*args, **kwargs),
-        'residence_form': ResidenceApplicationForm(*args, **kwargs)
-    }
+    context.update(get_forms(instance, POST))
+    context.update(get_formsets(instance, POST))
 
-def forms_are_valid(forms):
-    is_valid = True
-    for f in forms:
-        if not forms[f].is_valid:
-            is_valid = False
-            return is_valid
-
-    if is_valid:
-        return is_valid
+    t = loader.get_template('form/main.html')
+    c = RequestContext(request, context)
+    return HttpResponse(t.render(c))
 
 
 def add_new(request):
-    forms = get_forms()
-    exam_formset = ExamFormSet()
-    t = loader.get_template('form/main.html')
-    c = RequestContext(request, {'forms': forms, 'exam_formset': exam_formset})
-    return HttpResponse(t.render(c))
+    return display_form(request)
+
 
 
 def save(request):
@@ -63,12 +75,8 @@ def save(request):
 
 
 def edit(request, id):
-    a = Application.objects.get(pk=id)
-    forms = get_forms(instance=a)
-    exam_formset = ExamFormSet(instance=a)
-    t = loader.get_template('form/main.html')
-    c = RequestContext(request, {'forms': forms, 'id': id, 'exam_formset': exam_formset})
-    return HttpResponse(t.render(c))
+    instance = Application.objects.get(pk=id)
+    return display_form(request, id=id, instance=instance)
 
 
 def app_list(request):

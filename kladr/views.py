@@ -7,34 +7,46 @@ from django.shortcuts import get_object_or_404
 from models import *
 
 
-def kladr(request, action, value, parent):
-    if action == 'districts':
-        qs = get_districts(value)
-    elif action == 'cities':
-        qs = get_cities(value, parent)
-    elif action == 'streets':
-        qs = get_streets(value, parent)
-    else:
-        raise Http404
-    results = list(qs)
+def generate_json(request, items):
+    json = simplejson.dumps(items)
+    return HttpResponse(json, mimetype='application/json')
+
+
+def queryset2list(queryset):
+    results = list(queryset)
+    final = []
+    for item in results:
+        final.append({'value': item.pk, 'display': unicode(item)})
+    return final
+
+
+def queryset2json(request, queryset):
+    results = list(queryset)
     final = []
     for item in results:
         final.append({'value': item.pk, 'display': unicode(item)})
     json = simplejson.dumps(final)
     return HttpResponse(json, mimetype='application/json')
 
-def get_districts(value):
-    region = get_object_or_404(Region, pk=value)
-    return region.districts.all()
 
-def get_cities(value, parent):
-    if value == '0':
-        region = get_object_or_404(Region, pk=parent)
-        return City.objects.filter(region=region, district=None)
+def get_districts(request, region):
+    districts = District.objects.filter(id__startswith=region)
+    districts = queryset2list(districts)
+    districts.insert(0, {'value':'%s000' % region, 'display':'Нет'})
+    return generate_json(request, districts)
+
+
+def get_cities(request, district):
+    if 'term' in request.GET:
+        term = request.GET['term']
     else:
-        district = get_object_or_404(District, pk=value)
-        return district.cities.all()
+        return generate_json(request, [])
+    cities = City.objects.filter(id__startswith=district, name__istartswith=term)
+    cities = queryset2list(cities)
+    return generate_json(request, cities)
 
-def get_streets(value, parent):
-    city = get_object_or_404(City, pk=value)
-    return Street.objects.filter(city=city)
+
+def get_streets(request, city):
+    city = get_object_or_404(City, pk=city)
+    queryset = Street.objects.filter(city=city)
+    return generate_json(request, queryset2list(queryset))

@@ -6,6 +6,7 @@ from django.forms.widgets import RadioSelect
 from django.forms.models import inlineformset_factory, modelformset_factory
 import datetime
 from kladr.widgets import KladrSelectWidget, KladrTextWidget
+from widgets import ChainedSelectWidget, ChainedTextWidget
 
 class PersonalApplicationForm(ModelForm):
     class Meta:
@@ -31,27 +32,23 @@ class ResidenceApplicationForm(ModelForm):
                   'ResStreet', 'ResHouse', 'ResApartment', 'ResZipcode']
 
         widgets = {
-            'RegDistrict': KladrSelectWidget(
-            parent_name='RegRegion',
-            action='districts',
-            accept_empty=False,
-            empty_label='Нет',
+            'RegDistrict': ChainedSelectWidget(
+                parent_name='RegRegion',
+                url='/kladr/districts/'
             ),
 
-            'RegCity': KladrTextWidget(
-            parent_name='RegDistrict',
-            grandparent_name='RegRegion',
-            action='cities',
-            accept_empty=True,
-            empty_label='',
+            'RegCity': ChainedTextWidget(
+                parent_name='RegDistrict',
+                url='/kladr/cities/'
             ),
 
-            'RegStreet': KladrTextWidget(
-            parent_name='RegCity',
-            action='streets',
-            accept_empty=False,
-            empty_label='',
-            )
+            # 'RegStreet': KladrTextWidget(
+            # parent_name='RegCity',
+            # action='streets',
+            # accept_empty=False,
+            # empty_label='',
+            # ),
+
         }
 
     def __init__(self, *args, **kwargs):
@@ -59,40 +56,14 @@ class ResidenceApplicationForm(ModelForm):
         for f in self.fields:
             self.fields[f].empty_label = ''
 
-        self.fields['RegDistrict'].queryset = District.objects.filter(region=self.initial['RegRegion'])
-        self.fields['RegDistrict'].empty_label = 'Нет'
 
-        self.fields['RegCity'].queryset = City.objects.filter(
-            region=self.instance.RegRegion,
-            district=self.instance.RegDistrict
-        )
-
-        self.fields['RegStreet'].queryset = Street.objects.filter(
-            region=self.instance.RegRegion,
-            district=self.instance.RegDistrict,
-            city=self.instance.RegCity
-        )
+        # self.fields['RegStreet'].queryset = Street.objects.filter(
+        #     region=self.instance.RegRegion,
+        #     district=self.instance.RegDistrict,
+        #     city=self.instance.RegCity
+        # )
 
     def clean(self):
-        super(ResidenceApplicationForm, self).clean()
-        if 'RegDistrict' in self._errors:
-            district = District.objects.get(pk=self.data['RegDistrict'])
-            self.initial['RegDistrict'] = district.id
-            self.cleaned_data['RegDistrict'] = district
-            del self._errors['RegDistrict']
-
-        if 'RegCity' in self._errors:
-            city = City.objects.get(pk=self.data['RegCity'])
-            self.initial['RegCity'] = city.id
-            self.cleaned_data['RegCity'] = city
-            del self._errors['RegCity']
-
-        if 'RegStreet' in self._errors:
-            city = Street.objects.get(pk=self.data['RegStreet'])
-            self.initial['RegStreet'] = city.id
-            self.cleaned_data['RegStreet'] = city
-            del self._errors['RegStreet']
-
         return self.cleaned_data
 
 class ExamForm(ModelForm):

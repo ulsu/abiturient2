@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from form.models import Application
 
 class Direction(models.Model):
     name = models.CharField(max_length=255, verbose_name='название')
@@ -10,6 +11,16 @@ class Direction(models.Model):
     class Meta:
         verbose_name = 'направление'
         verbose_name_plural = 'направления'
+
+class Stream(models.Model):
+    name = models.CharField(max_length=255, verbose_name='название')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'поток'
+        verbose_name_plural = 'потоки'
 
 
 class Faculty(models.Model):
@@ -58,3 +69,12 @@ class Speciality(models.Model):
         verbose_name = 'специальность'
         verbose_name_plural = 'специальности'
         unique_together = ('direction', 'faculty', 'education_form')
+
+
+class EducationItem(models.Model):
+    application = models.ForeignKey(Application)
+    direction = models.ForeignKey(Direction, verbose_name='направление')
+    faculty = models.ForeignKey(Faculty, verbose_name='факультет')
+    education_form = models.ManyToManyField(EducationForm, verbose_name='формы обучения')
+    stream = models.ForeignKey(Stream, verbose_name='поток')
+    order = models.IntegerField()
