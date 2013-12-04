@@ -5,7 +5,6 @@ from kladr.models import *
 from django.forms.widgets import RadioSelect
 from django.forms.models import inlineformset_factory, modelformset_factory
 import datetime
-from kladr.widgets import KladrSelectWidget, KladrTextWidget
 from widgets import ChainedSelectWidget, ChainedTextWidget
 
 class PersonalApplicationForm(ModelForm):
