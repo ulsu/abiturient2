@@ -6,7 +6,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from models import *
 
-
 def generate_json(request, items):
     json = simplejson.dumps(items)
     return HttpResponse(json, mimetype='application/json')

@@ -15,7 +15,7 @@ class CityAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_region_admin_link', 'get_district_admin_link')
 
 class StreetAdmin(admin.ModelAdmin):
-    list_display = ('name', 'get_region_admin_link', 'get_district_admin_link')
+    list_display = ('name', 'get_region_admin_link', 'get_district_admin_link', 'get_city_admin_link')
 
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Region, RegionAdmin)
