@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div id="info-color-border" style="border: 1px black solid;margin-top: 50px;">
+        <div id="block-content">
+
+            <div style="padding: 28px;">
+
+                <div class="blocks-container">
+
+                    {% for b in var %}
+                            <a href="{{ b.actual_instance.display }}">
+                                <div class="big-block" id="{{b.id}}">
+                                    <div class="text-block">{{ b.title }}</div>
+                                </div>
+                            </a>
+                    {% endfor %}
+
+                    <div style="clear: both;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
