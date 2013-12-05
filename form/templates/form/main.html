@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#personal" data-toggle="tab">Персональная информация</a></li>
-        <li><a href="#registration" data-toggle="tab">Место жительства</a></li>
+        <li><a href="#personal" data-toggle="tab">Персональная информация</a></li>
+        <li class="active"><a href="#registration" data-toggle="tab">Место жительства</a></li>
         <li><a href="#education" data-toggle="tab">Образование</a></li>
         <li><a href="#specialities" data-toggle="tab">Специальности</a></li>
     </ul>
 
     <form action="/application/save/" method="POST" id="contacts_form">
     <div class="tab-content">
-        <div class="tab-pane active" id="personal">
-            {{ forms.personal_form.as_p }}
+        <div class="tab-pane" id="personal">
+            {{ personal_form.as_p }}
         </div>
-        <div class="tab-pane" id="registration">
-            {{ forms.residence_form.as_p }}
+        <div class="tab-pane active" id="registration">
+            {{ residence_form.as_p }}
         </div>
         <div class="tab-pane" id="education">
             <div id="exam_formset" class="entry" data-formset-prefix="{{ exam_formset.prefix }}">
@@ -32,31 +32,45 @@
             </div>
         </div>
         <div class="tab-pane" id="specialities">
-            <p>Nothing to show</p>
+            <div id="edu_formset" class="entry" data-formset-prefix="{{ edu_formset.prefix }}">
+                {{ edu_formset.management_form }}
+                <div data-formset-body>
+                    {% for form in edu_formset.forms %}
+                        {{ form.as_p }}
+                    {% endfor %}
+                </div>
+                <script type="form-template" data-formset-empty-form>
+                    {% with form=edu_formset.empty_form %}
+                        {{ form.as_p }}
+                    {% endwith %}
+                </script>
+                <input type="button" value="Add another" data-formset-add>
+            </div>
         </div>
     </div>
 
     {% if id %}<input type="hidden" name="id" value="{{ id }}" />{% endif %}
+    <input type="hidden" id="fresh_page" name="fresh_page" value="1" />
     {% csrf_token %}
      <input type="submit" value="Отправить">
     </form>
 {% endblock %}
 
 {% block js %}
-<script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
-<script src="{{ STATIC_URL }}packages/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="{{ STATIC_URL }}js/delayed_fill.js"></script>
-<script>
-    $(function(){
-        $("#exam_formset").formset();
-    });
-</script>
     <script>
-        $(function() {
 
-        });
     </script>
 
+    <script src="{{ STATIC_URL }}js/jstorage.min.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
+    <script src="{{ STATIC_URL }}packages/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="{{ STATIC_URL }}js/delayed_fill.js"></script>
+    <script>
+        $(function(){
+            $("#exam_formset").formset();
+            $("#edu_formset").formset();
+        });
+    </script>
 {% endblock %}
 
 {% block title %}Basic Formset (Table layout){% endblock %}

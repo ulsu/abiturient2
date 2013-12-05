@@ -1,126 +1,104 @@
-(function($) {
+$(function(){
+    var $fresh_page_indicator = $('#fresh_page');
+    var $fresh_page = false;
+
+    if ($fresh_page_indicator.val() == '1') {
+        $fresh_page_indicator.val('0');
+        $fresh_page = true;
+    }
+
+    function is_page_fresh(){
+        return $fresh_page;
+    }
+
     $(document).ready(function(){
-        function fill_empty(target, label) {
-            var options = '<option value="">' + label + '</option>';
+        function fill_empty(target) {
+            var options = '<option value=""></option>';
             target.html(options);
             target.find('option:first').attr('selected', 'selected');
         }
 
-        function fill_field(target, label, url, pk, parent_pk) {
-            var value = (pk)? pk : 0;
-            $.getJSON(url + value + '/' + parent_pk + '/', function(j) {
-                var options = '<option value="">' + label + '</option>';
-                for (var i = 0; i < j.length; i++) {
-                    options += '<option value="' + j[i].value + '">' + j[i].display + '</option>';
-                }
-                var width = target.outerWidth();
-                target.html(options);
-                if (navigator.appVersion.indexOf("MSIE") != -1)
-                    target.width(width + 'px');
-                target.find('option:first').attr('selected', 'selected');
+        function fill_field_by_data(target, data, value){
+            $.jStorage.set(target.attr('id'), data);
+            var options = '<option value=""></option>';
+            for (var i = 0; i < data.length; i++) {
+                options += '<option'+ ((value && value==data[i].value)?' selected="selected"':'') +' value="' + data[i].value + '">' + data[i].display + '</option>';
+            }
+            var width = target.outerWidth();
+            target.html(options);
+            if (navigator.appVersion.indexOf("MSIE") != -1)
+                target.width(width + 'px');
+
+            if (!value) target.find('option:first').attr('selected', 'selected');
+        }
+
+        function fill_field(target, url, pk) {
+            $.getJSON(url + pk + '/', function(j) {
+                fill_field_by_data(target, j);
             })
         }
 
-        // find parent select and assign handlers
-        $('select.kladr').each(function() {
+        $('select.chained').each(function() {
             var $parent = $('#' + $(this).data('parent-id')),
                 $target = $(this),
-                url = $(this).data('url'),
-                empty_label = $(this).data('empty-label'),
-                accept_empty = $(this).data('accept-empty') == 'True';
+                url = $(this).data('url');
+
+            if (!is_page_fresh()){
+                fill_field_by_data(
+                    $target,
+                    $.jStorage.get($target.attr('id')),
+                    $.jStorage.get($target.attr('id') + '_value')
+                );
+            }
+
+            $target.on('change', function(){
+                $.jStorage.set($target.attr('id')+'_value', $target.val());
+            });
 
             $parent.on('change', function() {
-                var parent_disabled = this.disabled == true;
                 var pk = $(this).val();
-                var parent_pk = 0;
-                if (pk == 0 && accept_empty && !parent_disabled){
-                    var $grandparent = $('#' + $(this).data('parent-id'));
-                    parent_pk = $grandparent.val();
-                }
-
-
-                if (!accept_empty && (!pk || pk == '')) {
-                    fill_empty($target, empty_label);
-                    $target.attr('disabled', true);
+                if (!pk || pk == '') {
+                    fill_empty($target);
+                    $target.attr('disabled', 'disabled');
                 } else {
-                    fill_field($target, empty_label, url, pk, parent_pk);
+                    fill_field($target, url, pk);
                     $target.attr('disabled', false);
-                    $target.val('');
                 }
-                $target.trigger('change');
+                $target.val('').trigger('change');
+
             });
         });
     });
-})(jQuery || django.jQuery);
 
 
-
-
-
-
-(function($) {
     $(document).ready(function(){
+        function get_source(url, pk){
+            return url + pk + '/';
+        }
 
-        function fill_empty(target, label, autocomplete_values) {
-            window[autocomplete_values] = [{
-                'value': "",
-                'label': label
-            }];
-            target.autocomplete('option', 'source', window[autocomplete_values]);
-            }
-
-        function fields_clean(target, hidden) {
-            target.val('');
-            hidden.val('');
-            }
-
-        function fields_change(target, hidden) {
-            target.trigger('change');
-            hidden.trigger('change');
-            }
-
-        function fields_disabled(target, hidden, value) {
-            target.attr('disabled', value);
-            hidden.attr('disabled', value);
-            }
-
-        function fill_field(target, label, url, pk, parent_pk, autocomplete_values) {
-            var value = (pk)? pk : 0;
-
-            $.getJSON(url + value + '/' + parent_pk + '/', function(j) {
-                console.log(j.length);
-                window[autocomplete_values] = [{
-                    'value': "",
-                    'label': label
-                }];
-                for (var i = 0; i < j.length; i++) {
-                    window[autocomplete_values].push({
-                        'value': j[i].value,
-                        'label': j[i].display
-                    });
-                }
-                target.autocomplete('option', 'source', window[autocomplete_values]);
-            });
-            }
-
-        $('input[type=text].kladr').each(function() {
+        $('input[type=text].chained').each(function() {
             var $parent = $('#' + $(this).data('parent-id')),
                 $hidden = $('#' + $(this).data('hidden-id')),
                 $target = $(this),
-                autocomplete_values = $(this).data('values'),
                 url = $(this).data('url'),
-                empty_label = $(this).data('empty-label'),
-                accept_empty = $(this).data('accept-empty') == 'True';
+                source;
+
+            console.log($parent);
+
+            if (!is_page_fresh())
+                source = $.jStorage.get($target.attr('id') + '_source');
+            else
+                source = get_source(url, $parent.val());
 
             $target.autocomplete({
                 minLength: 0,
-                source: window[autocomplete_values],
+                source: source,
                 focus: function( event, ui ) {
-                    $target.val( ui.item.label );
+                    $target.val( ui.item.display );
                     return false;
                 },
                 select: function( event, ui ) {
-                    $target.val( ui.item.label );
+                    $target.val( ui.item.display );
                     $hidden.val( ui.item.value );
                     $hidden.trigger('change');
                     return false;
@@ -131,32 +109,32 @@
                         $target.val( "" );
                         $hidden.val( "" ).change();
                         return false;
-                    }
+                    } else return true;
                 }
-            });
-
+            }) .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+                return $( "<li>" )
+                    .append( "<a>" + item.display + "</a>" )
+                    .appendTo( ul );
+            };
 
             $parent.on('change', function() {
-                var parent_disabled = this.disabled == true;
                 var pk = $(this).val();
-
-                var cannot_load_data = !accept_empty && (!pk || pk == '') || parent_disabled;
-
-                if (cannot_load_data)
-                    fill_empty($target, empty_label, autocomplete_values);
-                else {
-                    var parent_pk = 0;
-                    if (pk == 0 && accept_empty && !parent_disabled){
-                        var $grandparent = $('#' + $(this).data('parent-id'));
-                        parent_pk = $grandparent.val();
-                    }
-                    fill_field($target, empty_label, url, pk, parent_pk, autocomplete_values);
+                console.log(pk);
+                if (!pk || pk == '') {
+                    $.jStorage.set($target.attr('id')+'_value', undefined);
+                    $target.autocomplete('option', 'source', undefined);
+                    $target.attr('disabled', 'disabled');
+                } else {
+                    source = get_source(url, pk);
+                    $.jStorage.set($target.attr('id')+'_value', source);
+                    $target.autocomplete('option', 'source', source);
+                    $target.attr('disabled', false);
                 }
+                $target.val('').trigger('change');
 
-                fields_disabled($target, $hidden, cannot_load_data);
-                fields_clean($target, $hidden);
-                fields_change($target, $hidden);
             });
         });
     });
-})(jQuery || django.jQuery);
+});
+
+
