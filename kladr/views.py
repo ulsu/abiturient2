@@ -31,7 +31,6 @@ def queryset2json(request, queryset):
 def get_districts(request, region):
     districts = District.objects.filter(id__startswith=region)
     districts = queryset2list(districts)
-    districts.insert(0, {'value':'%s000' % region, 'display':'Нет'})
     return generate_json(request, districts)
 
 
@@ -46,6 +45,10 @@ def get_cities(request, district):
 
 
 def get_streets(request, city):
-    city = get_object_or_404(City, pk=city)
-    queryset = Street.objects.filter(city=city)
-    return generate_json(request, queryset2list(queryset))
+    if 'term' in request.GET:
+        term = request.GET['term']
+    else:
+        return generate_json(request, [])
+    streets = Street.objects.filter(id__startswith=city, name__istartswith=term)
+    streets = queryset2list(streets)
+    return generate_json(request, streets)

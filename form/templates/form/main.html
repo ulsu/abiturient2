@@ -7,13 +7,89 @@
         <li><a href="#specialities" data-toggle="tab">Специальности</a></li>
     </ul>
 
-    <form action="/application/save/" method="POST" id="contacts_form">
+    <form action="{{ url }}" method="POST" id="contacts_form">
     <div class="tab-content">
         <div class="tab-pane" id="personal">
             {{ personal_form.as_p }}
         </div>
         <div class="tab-pane active" id="registration">
-            {{ residence_form.as_p }}
+
+            <h2>Место жительства</h2>
+            <h3>Прописка</h3>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegCountry.auto_id }}">
+                    {{ residence_form.RegCountry.label }}</label>
+                {{ residence_form.RegCountry }}
+            </div>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegRegion.auto_id }}">
+                    {{ residence_form.RegRegion.label }}</label>
+                {{ residence_form.RegRegion }}
+            </div>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegDistrict.auto_id }}">
+                    {{ residence_form.RegDistrict.label }}</label>
+                {{ residence_form.RegDistrict }}
+            </div>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegCity.auto_id }}">
+                    {{ residence_form.RegCity.label }}</label>
+                {{ residence_form.RegCity }}
+            </div>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegStreet.auto_id }}">
+                    {{ residence_form.RegStreet.label }}</label>
+                {{ residence_form.RegStreet }}
+            </div>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegHouse.auto_id }}">
+                    {{ residence_form.RegHouse.label }}</label>
+                {{ residence_form.RegHouse }}
+            </div>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegApartment.auto_id }}">
+                    {{ residence_form.RegApartment.label }}</label>
+                {{ residence_form.RegApartment }}
+            </div>
+            <div class="form-group">
+                <label class="common-form-label" for="{{ residence_form.RegZipcode.auto_id }}">
+                    {{ residence_form.RegZipcode.label }}</label>
+                {{ residence_form.RegZipcode }}
+            </div>
+            <div class="form-group">
+                <label class="checkbox-form-label" for="{{ residence_form.ResEqualsReg.auto_id }}">
+                    {{ residence_form.ResEqualsReg }}{{ residence_form.ResEqualsReg.label }}</label>
+            </div>
+
+            <div id="residence-block" {% if residence_form.ResEqualsReg.value %} style="display:none;"{% endif %}>
+                <h3>Адрес фактического проживания</h3>
+                <p>Только для лиц, проживающих в городе Ульяновске</p>
+                <div class="form-group">
+                    <label class="common-form-label" for="{{ residence_form.ResStreet.auto_id }}">
+                        {{ residence_form.ResStreet.label }}</label>
+                    {{ residence_form.ResStreet }}
+                </div>
+                <div class="form-group">
+                    <label class="common-form-label" for="{{ residence_form.ResHouse.auto_id }}">
+                        {{ residence_form.ResHouse.label }}</label>
+                    {{ residence_form.ResHouse }}
+                </div>
+                <div class="form-group">
+                    <label class="common-form-label" for="{{ residence_form.ResApartment.auto_id }}">
+                        {{ residence_form.ResApartment.label }}</label>
+                    {{ residence_form.ResApartment }}
+                </div>
+                <div class="form-group">
+                    <label class="common-form-label" for="{{ residence_form.ResZipcode.auto_id }}">
+                        {{ residence_form.ResZipcode.label }}</label>
+                    {{ residence_form.ResZipcode }}
+                </div>
+            </div>
+
+{#            {{ residence_form.as_p }}#}
+
+
+
         </div>
         <div class="tab-pane" id="education">
             <div id="exam_formset" class="entry" data-formset-prefix="{{ exam_formset.prefix }}">
@@ -65,11 +141,20 @@
     <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
     <script src="{{ STATIC_URL }}packages/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="{{ STATIC_URL }}js/delayed_fill.js"></script>
+    <script src="{{ STATIC_URL }}js/tFormer.min.js"></script>
     <script>
         $(function(){
             $("#exam_formset").formset();
             $("#edu_formset").formset();
+
+            $('#id_ResEqualsReg').on('click', function(){
+                var display = this.checked;
+                $('#residence-block').css('display',((display)?'none':'block'));
+            });
         });
+    </script>
+
+    <script>var my_form_id = new tFormer('contacts_form');
     </script>
 {% endblock %}
 
@@ -90,6 +175,14 @@
     a.data-formset-delete-button{
         color: red;
         cursor: pointer;
+    }
+
+    label.common-form-label:after{
+        content: ':';
+    }
+
+    input[type=text].error{
+        border-color: red;
     }
 </style>
 {% endblock %}

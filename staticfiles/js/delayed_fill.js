@@ -44,6 +44,7 @@ $(function(){
                 url = $(this).data('url');
 
             if (!is_page_fresh()){
+                console.log('IMMA CHARGIN MAH DATA');
                 fill_field_by_data(
                     $target,
                     $.jStorage.get($target.attr('id')),
@@ -82,13 +83,15 @@ $(function(){
                 $target = $(this),
                 url = $(this).data('url'),
                 source;
-
-            console.log($parent);
+            var parent_exists = !!$parent.length;
 
             if (!is_page_fresh())
                 source = $.jStorage.get($target.attr('id') + '_source');
             else
+            if (parent_exists)
                 source = get_source(url, $parent.val());
+            else
+                source = url
 
             $target.autocomplete({
                 minLength: 0,
@@ -101,6 +104,7 @@ $(function(){
                     $target.val( ui.item.display );
                     $hidden.val( ui.item.value );
                     $hidden.trigger('change');
+                    $target.trigger('change');
                     return false;
 
                 },
@@ -117,21 +121,41 @@ $(function(){
                     .appendTo( ul );
             };
 
-            $parent.on('change', function() {
-                var pk = $(this).val();
-                console.log(pk);
-                if (!pk || pk == '') {
-                    $.jStorage.set($target.attr('id')+'_value', undefined);
-                    $target.autocomplete('option', 'source', undefined);
-                    $target.attr('disabled', 'disabled');
-                } else {
-                    source = get_source(url, pk);
-                    $.jStorage.set($target.attr('id')+'_value', source);
-                    $target.autocomplete('option', 'source', source);
-                    $target.attr('disabled', false);
-                }
-                $target.val('').trigger('change');
+            if (parent_exists)
+                $parent.on('change', function() {
+                    var pk = $(this).val();
+                    if (!pk || pk == '') {
+                        $.jStorage.set($target.attr('id')+'_value', undefined);
+                        $target.autocomplete('option', 'source', undefined);
+                        $target.attr('disabled', 'disabled');
+                    } else {
+                        source = get_source(url, pk);
+                        $.jStorage.set($target.attr('id')+'_value', source);
+                        $target.autocomplete('option', 'source', source);
+                        $target.attr('disabled', false);
+                    }
+                    $target.val('');
+                    $hidden.val('').trigger('change');
 
+                });
+        });
+    });
+
+
+
+    $(document).ready(function(){
+        $('select.dependent, input[type=text].dependent').each(function() {
+            var $parent = $('#' + $(this).data('dependent-field')),
+                $value = $(this).data('dependent-value'),
+                $target = $(this);
+
+            $parent.on('change', function() {
+                $target.val('');
+                if ($value)
+                    $target.attr('disabled', $(this).val()!=$value);
+                else
+                    $target.attr('disabled', !$(this).val());
+                $target.trigger('change');
             });
         });
     });

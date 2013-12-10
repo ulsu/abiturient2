@@ -20,30 +20,37 @@ class ChainedSelectWidget(Select):
         output = super(ChainedSelectWidget, self).render(name, value, attrs, choices)
         return mark_safe(output)
 
-
-
+class SelectWidget(Select):
+    def render(self, name, value, attrs=None, choices=()):
+        self.name = name
+        output = super(SelectWidget, self).render(name, value, attrs, choices)
+        return mark_safe(output)
 
 
 class ChainedTextWidget(Select):
-    def __init__(self, parent_name, url, attrs=None, choices=()):
-        self.display_settings = {
-            'data-parent-id': 'id_%s' % parent_name,
+    def __init__(self, url, parent_name=None, attrs=None, choices=()):
+        settings = {
             'data-url': url
-            }
+        }
 
-        self.settings = {
-            'data-parent-id': 'id_%s' % parent_name,
-            'data-url': url
-            }
+        if parent_name is not None:
+            settings['data-parent-id'] = 'id_%s' % parent_name
+
+        self.display_settings = settings
+        self.hidden_settings = settings
 
         self.choices = list(choices)
+        self.attrs = attrs
         super(Select, self).__init__(attrs)
 
     def render(self, name, value, attrs=None, choices=()):
+        if self.attrs is None:
+            attrs = {}
+        else:
+            attrs = self.attrs
+
         if value is None:
             value = ''
-
-
         display_value = ''
         for k, v in self.choices:
             if k == value:
@@ -55,16 +62,18 @@ class ChainedTextWidget(Select):
             'class': 'chained',
             'value': display_value,
         })
-        attrs = dict(self.settings, **{
+
+        hidden_attrs = dict(self.hidden_settings, **{
             'id':'id_%s' % name,
             'name': name,
             'value': value,
             'class': 'chained'
         })
 
+        display_attrs.update(attrs)
 
         return render_to_string('form/widgets/chained_text_widget.html', {
             'display_attrs': flatatt(display_attrs),
-            'attrs': flatatt(attrs),
+            'attrs': flatatt(hidden_attrs),
             'display_value': display_value
         })

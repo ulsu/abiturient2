@@ -72,9 +72,9 @@ class Speciality(models.Model):
 
 
 class EducationItem(models.Model):
-    application = models.ForeignKey(Application)
-    direction = models.ForeignKey(Direction, verbose_name='направление')
-    faculty = models.ForeignKey(Faculty, verbose_name='факультет')
-    education_form = models.ManyToManyField(EducationForm, verbose_name='формы обучения')
-    stream = models.ForeignKey(Stream, verbose_name='поток')
-    order = models.IntegerField()
+    application = models.ForeignKey(Application, null=True, blank=True)
+    direction = models.ForeignKey(Direction, verbose_name='направление', null=True, blank=True)
+    faculty = models.ForeignKey(Faculty, verbose_name='факультет', null=True, blank=True)
+    education_form = models.ManyToManyField(EducationForm, verbose_name='формы обучения', null=True, blank=True)
+    stream = models.ForeignKey(Stream, verbose_name='поток', null=True, blank=True)
+    order = models.IntegerField(null=True, blank=True)

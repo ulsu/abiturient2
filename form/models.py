@@ -4,73 +4,49 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from kladr.models import *
 
-class IDSocialStatus(models.Model):
-    name = models.CharField(max_length=255)
+class UnicodeIsNameMixin(object):
     def __unicode__(self):
         return self.name
+
+class IDSocialStatus(models.Model, UnicodeIsNameMixin):
+    name = models.CharField(max_length=255)
+
 
     class Meta:
         verbose_name = 'социальный статус'
         verbose_name_plural = 'социальные статусы'
 
-class IDSocialStatusAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-admin.site.register(IDSocialStatus,IDSocialStatusAdmin)
 
-
-class Nationality(models.Model):
+class Nationality(models.Model, UnicodeIsNameMixin):
     name = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.name
 
     class Meta:
         verbose_name = 'национальность'
         verbose_name_plural = 'национальности'
 
-class NationalityAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-admin.site.register(Nationality,NationalityAdmin)
 
-
-class MilitaryStatus(models.Model):
+class MilitaryStatus(models.Model, UnicodeIsNameMixin):
     name=models.CharField(max_length=255)
-    def __unicode__(self):
-        return self.name
 
     class Meta:
         verbose_name = 'военная служба'
         verbose_name_plural = 'военные службы'
 
-class MilitaryStatusAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-admin.site.register(MilitaryStatus,MilitaryStatusAdmin)
 
-
-class Language(models.Model):
+class Language(models.Model, UnicodeIsNameMixin):
     name = models.CharField(max_length=255)
-    def __unicode__(self):
-        return self.name
 
     class Meta:
         verbose_name = 'иностранный язык'
         verbose_name_plural = 'иностранные языки'
 
-class LanguageAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-admin.site.register(Language,LanguageAdmin)
-
-
-class Citizenship(models.Model):
+class Citizenship(models.Model, UnicodeIsNameMixin):
     name = models.CharField(max_length=255)
 
     class Meta:
         verbose_name = 'гражданство'
         verbose_name_plural = 'гражданства'
 
-class CitizenshipAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-admin.site.register(Citizenship, CitizenshipAdmin)
 
 class Application(models.Model):
     GENDER=(
@@ -99,43 +75,30 @@ class Application(models.Model):
     PassportIssued  = models.CharField(max_length=255,  blank=True, verbose_name='Паспорт выдан')
 
 
-    RegCountry = models.ForeignKey(Country, blank=True, null=True)
-    RegRegion = models.ForeignKey(Region, blank=True, null=True)
-    RegDistrict = models.ForeignKey(District, blank=True, null=True)
-    RegCity = models.ForeignKey(City, blank=True, null=True)
-    RegStreet = models.ForeignKey(Street, blank=True, null=True, related_name='+')
-    RegHouse = models.CharField(max_length=255, blank=True, null=True)
-    RegApartment = models.CharField(max_length=255, blank=True, null=True)
-    RegZipcode = models.IntegerField(max_length=6, blank=True, null=True)
+    RegCountry = models.ForeignKey(Country, blank=True, null=True, verbose_name='Страна')
+    RegRegion = models.ForeignKey(Region, blank=True, null=True, verbose_name='Регион')
+    RegDistrict = models.ForeignKey(District, blank=True, null=True, verbose_name='Район')
+    RegCity = models.ForeignKey(City, blank=True, null=True, verbose_name='Город')
+    RegStreet = models.ForeignKey(Street, blank=True, null=True, related_name='+', verbose_name='Улица')
+    RegHouse = models.CharField(max_length=255, blank=True, null=True, verbose_name='Дом')
+    RegApartment = models.CharField(max_length=255, blank=True, null=True, verbose_name='Квартира')
+    RegZipcode = models.IntegerField(max_length=6, blank=True, null=True, verbose_name='Почтовый индекс')
+
+    ResEqualsReg = models.BooleanField(default=True, verbose_name='Прописка и адрес фактического проживания совпадают')
 
     #Ulyanovsk-city only
-    ResStreet = models.ForeignKey(Street, blank=True, null=True, related_name='+')
-    ResHouse = models.CharField(max_length=255, blank=True, null=True)
-    ResApartment = models.CharField(max_length=255, blank=True, null=True)
-    ResZipcode = models.IntegerField(max_length=6, blank=True, null=True)
+    ResStreet = models.ForeignKey(Street, blank=True, null=True, related_name='+', verbose_name='Улица')
+    ResHouse = models.CharField(max_length=255, blank=True, null=True, verbose_name='Дом')
+    ResApartment = models.CharField(max_length=255, blank=True, null=True, verbose_name='Квартира')
+    ResZipcode = models.IntegerField(max_length=6, blank=True, null=True, verbose_name='Почтовый индекс')
 
     def __unicode__(self):
         return "%s %s %s" % (self.LastName, self.FirstName, self.MiddleName)
 
 
-class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('LastName', 'FirstName', 'MiddleName')
-    search_fields = ['LastName', 'FirstName', 'MiddleName']
 
-admin.site.register(Application, ApplicationAdmin)
-
-
-class ExamName(models.Model):
+class ExamName(models.Model, UnicodeIsNameMixin):
     name = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.name
-
-class ExamNameAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-
-admin.site.register(ExamName, ExamNameAdmin)
-
 
 class Exam(models.Model):
     Number   = models.CharField(max_length=20, blank=True, verbose_name='Номер свидетельства ЕГЭ')
@@ -151,7 +114,3 @@ class Exam(models.Model):
     class Meta:
         verbose_name = 'свидетельство ЕГЭ'
         verbose_name_plural = 'свидетельства ЕГЭ'
-
-class ExamAdmin(admin.ModelAdmin):
-    list_display = ('Number', 'ExamName', 'Mark', 'application',)
-admin.site.register(Exam, ExamAdmin)

@@ -21,9 +21,13 @@ class ExamAdmin(admin.ModelAdmin):
 class SpecialityAdmin(admin.ModelAdmin):
     list_display = ('faculty', 'direction', 'education_form')
 
+class EducationItemAdmin(admin.ModelAdmin):
+    list_display = ('faculty', 'direction')
+
 admin.site.register(Stream, StreamAdmin)
 admin.site.register(Direction, DirectionAdmin)
 admin.site.register(Faculty, FacultyAdmin)
 admin.site.register(EducationForm, EducationFormAdmin)
 admin.site.register(Exam, ExamAdmin)
 admin.site.register(Speciality, SpecialityAdmin)
+admin.site.register(EducationItem, EducationItemAdmin)

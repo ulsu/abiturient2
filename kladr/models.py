@@ -47,8 +47,8 @@ class CityMixin(object):
 
 class KLADRItem(models.Model):
     name = models.CharField(max_length=255, verbose_name='название')
-    full_type = models.CharField(max_length=255, verbose_name='полный тип')
-    short_type = models.CharField(max_length=255, verbose_name='краткий тип')
+    full_type = models.CharField(max_length=255, verbose_name='полный тип', blank=True)
+    short_type = models.CharField(max_length=255, verbose_name='краткий тип', blank=True)
 
     class Meta:
         abstract = True
@@ -59,6 +59,7 @@ class KLADRItem(models.Model):
     def get_name_with_type(self):
         return '%s %s' % (self.name, self.full_type)
     get_name_with_type.short_description = 'название'
+    get_name_with_type.admin_order_field = 'name'
 
 
 class Country(models.Model):
@@ -81,9 +82,11 @@ class Region(KLADRItem):
 
 class District(KLADRItem, RegionMixin):
     id = models.CharField(max_length=5, verbose_name='КЛАДР ID', primary_key=True)
+    empty = models.BooleanField(default=False)
     class Meta:
         verbose_name = 'районы'
         verbose_name_plural = 'районы'
+        ordering = ['-empty']
 
 
 class City(KLADRItem, RegionMixin, DistrictMixin):
