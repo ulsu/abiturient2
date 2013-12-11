@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.forms.widgets import Select, TextInput
+from __future__ import absolute_import, unicode_literals
+from django.forms.widgets import Select, CheckboxSelectMultiple, CheckboxInput
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_text
 from django.forms.util import flatatt
-from django.utils.html import format_html
 from django.template.loader import render_to_string
-
+from itertools import chain
+from django.utils.html import format_html
 
 class ChainedSelectWidget(Select):
     def __init__(self, parent_name, url, *args, **kwargs):
@@ -19,6 +20,7 @@ class ChainedSelectWidget(Select):
         attrs = dict(self.settings, **{'class': 'chained','id': 'id_%s' % name })
         output = super(ChainedSelectWidget, self).render(name, value, attrs, choices)
         return mark_safe(output)
+
 
 class SelectWidget(Select):
     def render(self, name, value, attrs=None, choices=()):
@@ -77,3 +79,37 @@ class ChainedTextWidget(Select):
             'attrs': flatatt(hidden_attrs),
             'display_value': display_value
         })
+
+
+class ChainedCheckboxSelectMultiple(CheckboxSelectMultiple):
+    def __init__(self, url, parent_name=None, *args, **kwargs):
+        self.settings = {
+            'data-parent-id': 'id_%s' % parent_name,
+            'data-url': url
+        }
+        super(ChainedCheckboxSelectMultiple, self).__init__(*args, **kwargs)
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None: value = []
+        has_id = attrs and 'id' in attrs
+        final_attrs = self.build_attrs(attrs, name=name)
+        output = ['<ul %s>' % flatatt(self.settings)]
+        # Normalize to strings
+        str_values = set([force_text(v) for v in value])
+        for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
+            # If an ID attribute was given, add a numeric index as a suffix,
+            # so that the checkboxes don't all have the same ID attribute.
+            if has_id:
+                final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+                label_for = format_html(' for="{0}"', final_attrs['id'])
+            else:
+                label_for = ''
+
+            cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
+            option_value = force_text(option_value)
+            rendered_cb = cb.render(name, option_value)
+            option_label = force_text(option_label)
+            output.append(format_html('<li><label{0}>{1} {2}</label></li>',
+                                      label_for, rendered_cb, option_label))
+        output.append('</ul>')
+        return mark_safe('\n'.join(output))

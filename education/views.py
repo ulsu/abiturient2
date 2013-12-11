@@ -29,6 +29,6 @@ def queryset2json(request, queryset):
 
 
 def get_faculties(request, direction):
-    faculties = Faculty.objects.filter(speciality__direction__id=direction)
+    faculties = Speciality.objects.filter(direction_id=direction)
     faculties = queryset2list(faculties)
     return generate_json(request, faculties)

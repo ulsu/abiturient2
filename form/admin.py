@@ -20,11 +20,9 @@ class LanguageAdmin(admin.ModelAdmin):
 class CitizenshipAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
-
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = ('LastName', 'FirstName', 'MiddleName')
     search_fields = ['LastName', 'FirstName', 'MiddleName']
-
 
 class ExamNameAdmin(admin.ModelAdmin):
     list_display = ('name',)
