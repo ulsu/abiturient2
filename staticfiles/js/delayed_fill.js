@@ -32,9 +32,9 @@ $(function(){
             if (!value) target.find('option:first').attr('selected', 'selected');
         }
 
-        function fill_field(target, url, pk) {
+        function fill_field(target, url, pk, val) {
             $.getJSON(url + pk + '/', function(j) {
-                fill_field_by_data(target, j);
+                fill_field_by_data(target, j, val);
             })
         }
 
@@ -44,7 +44,6 @@ $(function(){
                 url = $(this).data('url');
 
             if (!is_page_fresh()){
-                console.log('IMMA CHARGIN MAH DATA');
                 fill_field_by_data(
                     $target,
                     $.jStorage.get($target.attr('id')),
@@ -62,7 +61,7 @@ $(function(){
                     fill_empty($target);
                     $target.attr('disabled', 'disabled');
                 } else {
-                    fill_field($target, url, pk);
+                    fill_field($target, url, pk, $target.val());
                     $target.attr('disabled', false);
                 }
                 $target.val('').trigger('change');
