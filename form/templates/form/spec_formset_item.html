@@ -1,0 +1,11 @@
+<div data-formset-form class="data-formset-form">
+    {% with input=form.direction %}{% include 'form/form-group.html' %}{% endwith %}
+    {% with input=form.faculty %}{% include 'form/form-group.html' %}{% endwith %}
+    {% with input=form.education_form %}{% include 'form/form-group.html' %}{% endwith %}
+    {% with input=form.stream %}{% include 'form/form-group.html' %}{% endwith %}
+    {{ form.id }}
+    <span class="hidden">{{ form.DELETE }}</span>
+    <a data-formset-delete-button class="data-formset-delete-button formset-button"><span class="glyphicon glyphicon-remove"></span></a>
+    <a data-formset-up-button class="data-formset-up-button formset-button"><span class="glyphicon glyphicon glyphicon-arrow-up"></span></a>
+    <a data-formset-down-button class="data-formset-down-button formset-button"><span class="glyphicon glyphicon glyphicon-arrow-down"></span></a>
+</div>

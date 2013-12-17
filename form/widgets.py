@@ -17,7 +17,8 @@ class ChainedSelectWidget(Select):
         super(ChainedSelectWidget, self).__init__(*args, **kwargs)
 
     def render(self, name, value, attrs=None, choices=()):
-        attrs = dict(self.settings, **{'class': 'chained','id': 'id_%s' % name })
+        classname = '%s %s' % (self.attrs['class'], 'chained') if 'class' in self.attrs else 'chained'
+        attrs = dict(self.settings, **{'class': classname,'id': 'id_%s' % name })
         output = super(ChainedSelectWidget, self).render(name, value, attrs, choices)
         return mark_safe(output)
 
@@ -58,10 +59,12 @@ class ChainedTextWidget(Select):
             if k == value:
                 display_value = v
 
+        classname = '%s %s' % (self.attrs['class'], 'chained') if 'class' in self.attrs else 'chained'
+
         display_attrs = dict(self.display_settings, **{
             'id': 'id_%s_display' % name,
             'data-hidden-id': 'id_%s' % name,
-            'class': 'chained',
+            'class': classname,
             'value': display_value,
         })
 
@@ -72,8 +75,6 @@ class ChainedTextWidget(Select):
             'class': 'chained'
         })
 
-        display_attrs.update(attrs)
-
         return render_to_string('form/widgets/chained_text_widget.html', {
             'display_attrs': flatatt(display_attrs),
             'attrs': flatatt(hidden_attrs),
@@ -82,10 +83,13 @@ class ChainedTextWidget(Select):
 
 
 class ChainedCheckboxSelectMultiple(CheckboxSelectMultiple):
-    def __init__(self, url, parent_name=None, *args, **kwargs):
+    def __init__(self, url, item_prefix, parent_name=None, *args, **kwargs):
         self.settings = {
             'data-parent-id': 'id_%s' % parent_name,
-            'data-url': url
+            'data-url': url,
+            'class': 'chained',
+            'data-item-prefix': item_prefix,
+            'id': '%s_ul' % item_prefix
         }
         super(ChainedCheckboxSelectMultiple, self).__init__(*args, **kwargs)
 

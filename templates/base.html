@@ -6,13 +6,13 @@
     {% block css %}{% endblock %}
     <style type="text/css">
         #main_content{
-            width: 800px;
+            max-width: 800px;
             margin: 50px auto 0;
         }
     </style>
 </head>
 <body>
-<div id="main_content">
+<div id="main_content" class="container">
     {% block content %}{% endblock %}
 </div>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>

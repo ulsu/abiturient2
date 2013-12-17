@@ -1,17 +1,40 @@
+var $fresh_page = false;
+
 $(function(){
     var $fresh_page_indicator = $('#fresh_page');
-    var $fresh_page = false;
-
     if ($fresh_page_indicator.val() == '1') {
         $fresh_page_indicator.val('0');
         $fresh_page = true;
     }
+});
 
-    function is_page_fresh(){
-        return $fresh_page;
-    }
+function is_page_fresh(){
+    return $fresh_page;
+}
 
+$(function(){
+    bind_stuff();
     $(document).ready(function(){
+        $('select.dependent, input[type=text].dependent').each(function() {
+            var $parent = $('#' + $(this).data('dependent-field')),
+                $value = $(this).data('dependent-value'),
+                $target = $(this);
+
+            $parent.on('change', function() {
+                $target.val('');
+                if ($value)
+                    $target.attr('disabled', $(this).val()!=$value);
+                else
+                    $target.attr('disabled', !$(this).val());
+                $target.trigger('change');
+            });
+        });
+    });
+});
+
+
+function bind_stuff(){
+    $(function(){
         function fill_empty(target) {
             var options = '<option value=""></option>';
             target.html(options);
@@ -41,14 +64,19 @@ $(function(){
         $('select.chained').each(function() {
             var $parent = $('#' + $(this).data('parent-id')),
                 $target = $(this),
-                url = $(this).data('url');
+                url = $(this).data('url'),
+                storage_id = $target.attr('id');
 
-            if (!is_page_fresh()){
+
+            if (!is_page_fresh() && $.jStorage.get(storage_id, false)){
                 fill_field_by_data(
                     $target,
-                    $.jStorage.get($target.attr('id')),
-                    $.jStorage.get($target.attr('id') + '_value')
+                    $.jStorage.get(storage_id),
+                    $.jStorage.get(storage_id + '_value')
                 );
+            } else {
+                $.jStorage.deleteKey(storage_id);
+                $.jStorage.deleteKey(storage_id + '_value');
             }
 
             $target.on('change', function(){
@@ -69,9 +97,72 @@ $(function(){
             });
         });
     });
+    $(function(){
+        function fill_empty(target) {
+            target.html('');
+            target.css('display','none');
+        }
 
+        function fill_field_by_data(target, data, value, item_prefix){
+            target.css('display','');
+//            $.jStorage.set(target.attr('id'), data);
+            var checkboxes = '';
+            for (var i = 0; i < data.length; i++) {
+                checkboxes += '<li>' +
+                    '<label for="'+item_prefix+'_'+i+'">' +
+                    '<input type="checkbox" id="'+item_prefix+'_'+i+'" name="'+item_prefix+'"'+ ((value && value==data[i].value)?' checked="checked"':'') +' value="' + data[i].value + '"> ' + data[i].display + '</label></li>';
+            }
+            var width = target.outerWidth();
+            target.html(checkboxes);
+            if (navigator.appVersion.indexOf("MSIE") != -1)
+                target.width(width + 'px');
 
-    $(document).ready(function(){
+            if (!value) target.find('option:first').attr('selected', 'selected');
+        }
+
+        function fill_field(target, url, pk, val, item_prefix) {
+            $.getJSON(url + pk + '/', function(j) {
+                fill_field_by_data(target, j, val, item_prefix);
+            })
+        }
+
+        $('ul.chained').each(function() {
+            var $parent = $('#' + $(this).data('parent-id')),
+                $target = $(this),
+                url = $(this).data('url'),
+                item_prefix = $(this).data('item-prefix'),
+                storage_id = $target.attr('id');
+
+            if (!is_page_fresh() && $.jStorage.get(storage_id, false)){
+                fill_field_by_data(
+                    $target,
+                    $.jStorage.get(storage_id),
+                    $.jStorage.get(storage_id + '_value')
+                );
+            } else {
+                $.jStorage.deleteKey(storage_id);
+                $.jStorage.deleteKey(storage_id + '_value');
+            }
+
+            $target.on('change', function(){
+                $.jStorage.set($target.attr('id')+'_value', $target.val());
+            });
+
+            $parent.on('change', function() {
+                var pk = $(this).val();
+                if (!pk || pk == '') {
+                    fill_empty($target);
+                    $target.attr('disabled', 'disabled');
+                } else {
+                    fill_field($target, url, pk, $target.val(), item_prefix);
+                    $target.attr('disabled', false);
+                }
+                $target.val('').trigger('change');
+
+            });
+        });
+    });
+    $(function(){
         function get_source(url, pk){
             return url + pk + '/';
         }
@@ -90,7 +181,7 @@ $(function(){
             if (parent_exists)
                 source = get_source(url, $parent.val());
             else
-                source = url
+                source = url;
 
             $target.autocomplete({
                 minLength: 0,
@@ -139,25 +230,9 @@ $(function(){
                 });
         });
     });
-
-
-
-    $(document).ready(function(){
-        $('select.dependent, input[type=text].dependent').each(function() {
-            var $parent = $('#' + $(this).data('dependent-field')),
-                $value = $(this).data('dependent-value'),
-                $target = $(this);
-
-            $parent.on('change', function() {
-                $target.val('');
-                if ($value)
-                    $target.attr('disabled', $(this).val()!=$value);
-                else
-                    $target.attr('disabled', !$(this).val());
-                $target.trigger('change');
-            });
-        });
+    $(function(){
+        console.log(is_page_fresh());
     });
-});
+}
 
 

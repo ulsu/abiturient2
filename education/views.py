@@ -32,3 +32,9 @@ def get_faculties(request, direction):
     faculties = Speciality.objects.filter(direction_id=direction)
     faculties = queryset2list(faculties)
     return generate_json(request, faculties)
+
+
+def get_edu_forms(request, faculty):
+    edu_forms = SpecialityItem.objects.filter(speciality_id=faculty)
+    edu_forms = queryset2list(edu_forms)
+    return generate_json(request, edu_forms)

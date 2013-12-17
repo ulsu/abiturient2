@@ -1,15 +1,11 @@
 <div data-formset-form class="data-formset-form">
-    {{ form.Number.label_tag }}
-    {{ form.Number }}<br />
-    {{ form.ExamName.label_tag }}
-    {{ form.ExamName }}<br />
-    {{ form.Mark.label_tag }}
-    {{ form.Mark }}<br />
-    {{ form.DocSer.label_tag }}
-    {{ form.DocSer }}<br />
-    {{ form.DocNum.label_tag }}
-    {{ form.DocNum }}<br />
-    {{ form.id }}<br />
+
+    {% with input=form.Number %}{% include 'form/form-group.html' %}{% endwith %}
+    {% with input=form.ExamName %}{% include 'form/form-group.html' %}{% endwith %}
+    {% with input=form.Mark %}{% include 'form/form-group.html' %}{% endwith %}
+    {% with input=form.DocSer %}{% include 'form/form-group.html' %}{% endwith %}
+    {% with input=form.DocNum %}{% include 'form/form-group.html' %}{% endwith %}
+    {{ form.id }}
     <span class="hidden">{{ form.DELETE }}</span>
-    <a data-formset-delete-button class="data-formset-delete-button">Delete form</a>
+    <a data-formset-delete-button class="data-formset-delete-button"><span class="glyphicon glyphicon-remove"></span></a>
 </div>

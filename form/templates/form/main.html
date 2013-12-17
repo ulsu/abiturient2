@@ -1,61 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
     <ul class="nav nav-tabs">
-        <li><a href="#personal" data-toggle="tab">Персональная информация</a></li>
-        <li class="active"><a href="#registration" data-toggle="tab">Место жительства</a></li>
+        <li class="active"><a href="#personal" data-toggle="tab">Персональная информация</a></li>
+        <li><a href="#registration" data-toggle="tab">Место жительства</a></li>
         <li><a href="#education" data-toggle="tab">Образование</a></li>
         <li><a href="#specialities" data-toggle="tab">Специальности</a></li>
     </ul>
 
     <form action="{{ url }}" method="POST" id="contacts_form">
     <div class="tab-content">
-        <div class="tab-pane" id="personal">
-            {{ personal_form.as_p }}
+        <div class="tab-pane active" id="personal">
+            <h2>Персональная информация</h2>
+            {% for input in personal_form %}
+                {% include 'form/form-group.html' %}
+            {% endfor %}
         </div>
-        <div class="tab-pane active" id="registration">
-
+        <div class="tab-pane" id="registration">
             <h2>Место жительства</h2>
             <h3>Прописка</h3>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegCountry.auto_id }}">
-                    {{ residence_form.RegCountry.label }}</label>
-                {{ residence_form.RegCountry }}
-            </div>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegRegion.auto_id }}">
-                    {{ residence_form.RegRegion.label }}</label>
-                {{ residence_form.RegRegion }}
-            </div>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegDistrict.auto_id }}">
-                    {{ residence_form.RegDistrict.label }}</label>
-                {{ residence_form.RegDistrict }}
-            </div>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegCity.auto_id }}">
-                    {{ residence_form.RegCity.label }}</label>
-                {{ residence_form.RegCity }}
-            </div>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegStreet.auto_id }}">
-                    {{ residence_form.RegStreet.label }}</label>
-                {{ residence_form.RegStreet }}
-            </div>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegHouse.auto_id }}">
-                    {{ residence_form.RegHouse.label }}</label>
-                {{ residence_form.RegHouse }}
-            </div>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegApartment.auto_id }}">
-                    {{ residence_form.RegApartment.label }}</label>
-                {{ residence_form.RegApartment }}
-            </div>
-            <div class="form-group">
-                <label class="common-form-label" for="{{ residence_form.RegZipcode.auto_id }}">
-                    {{ residence_form.RegZipcode.label }}</label>
-                {{ residence_form.RegZipcode }}
-            </div>
+            {% with input=residence_form.RegCountry %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=residence_form.RegRegion %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=residence_form.RegDistrict %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=residence_form.RegCity %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=residence_form.RegStreet %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=residence_form.RegHouse %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=residence_form.RegApartment %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=residence_form.RegZipcode %}{% include 'form/form-group.html' %}{% endwith %}
+
             <div class="form-group">
                 <label class="checkbox-form-label" for="{{ residence_form.ResEqualsReg.auto_id }}">
                     {{ residence_form.ResEqualsReg }}{{ residence_form.ResEqualsReg.label }}</label>
@@ -64,64 +35,24 @@
             <div id="residence-block" {% if residence_form.ResEqualsReg.value %} style="display:none;"{% endif %}>
                 <h3>Адрес фактического проживания</h3>
                 <p>Только для лиц, проживающих в городе Ульяновске</p>
-                <div class="form-group">
-                    <label class="common-form-label" for="{{ residence_form.ResStreet.auto_id }}">
-                        {{ residence_form.ResStreet.label }}</label>
-                    {{ residence_form.ResStreet }}
-                </div>
-                <div class="form-group">
-                    <label class="common-form-label" for="{{ residence_form.ResHouse.auto_id }}">
-                        {{ residence_form.ResHouse.label }}</label>
-                    {{ residence_form.ResHouse }}
-                </div>
-                <div class="form-group">
-                    <label class="common-form-label" for="{{ residence_form.ResApartment.auto_id }}">
-                        {{ residence_form.ResApartment.label }}</label>
-                    {{ residence_form.ResApartment }}
-                </div>
-                <div class="form-group">
-                    <label class="common-form-label" for="{{ residence_form.ResZipcode.auto_id }}">
-                        {{ residence_form.ResZipcode.label }}</label>
-                    {{ residence_form.ResZipcode }}
-                </div>
+                {% with input=residence_form.ResStreet %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=residence_form.ResHouse %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=residence_form.ResApartment %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=residence_form.ResZipcode %}{% include 'form/form-group.html' %}{% endwith %}
             </div>
-
-{#            {{ residence_form.as_p }}#}
-
-
-
         </div>
         <div class="tab-pane" id="education">
-            <div id="exam_formset" class="entry" data-formset-prefix="{{ exam_formset.prefix }}">
-                {{ exam_formset.management_form }}
-                <div data-formset-body>
-                    {% for form in exam_formset.forms %}
-                        {% include 'form/exam_formset_item.html' %}
-                    {% endfor %}
-                </div>
-                <script type="form-template" data-formset-empty-form>
-                    {% with form=exam_formset.empty_form %}
-                        {% include 'form/exam_formset_item.html' %}
-                    {% endwith %}
-                </script>
-                <input type="button" value="Add another" data-formset-add>
-            </div>
+            <h2>Образование</h2>
+            <h3>Результаты ЕГЭ</h3>
+            {% with formset=exam_formset formset_id='exam_formset' formset_template='form/exam_formset_item.html' %}
+                {% include 'form/formset-container.html' %}
+            {% endwith %}
         </div>
         <div class="tab-pane" id="specialities">
-            <div id="edu_formset" class="entry" data-formset-prefix="{{ edu_formset.prefix }}">
-                {{ edu_formset.management_form }}
-                <div data-formset-body>
-                    {% for form in edu_formset.forms %}
-                        {{ form.as_p }}
-                    {% endfor %}
-                </div>
-                <script type="form-template" data-formset-empty-form>
-                    {% with form=edu_formset.empty_form %}
-                        {{ form.as_p }}
-                    {% endwith %}
-                </script>
-                <input type="button" value="Add another" data-formset-add>
-            </div>
+            <h2>Специальности</h2>
+            {% with formset=edu_formset formset_id='edu_formset' formset_template='form/spec_formset_item.html' %}
+                {% include 'form/formset-container.html' %}
+            {% endwith %}
         </div>
     </div>
 
@@ -151,6 +82,36 @@
                 var display = this.checked;
                 $('#residence-block').css('display',((display)?'none':'block'));
             });
+
+            function swapElements(elm1, elm2) {
+                var parent1, next1,
+                        parent2, next2;
+
+                parent1 = elm1.parentNode;
+                next1   = elm1.nextSibling;
+                parent2 = elm2.parentNode;
+                next2   = elm2.nextSibling;
+
+                parent1.insertBefore(elm2, next1);
+                parent2.insertBefore(elm1, next2);
+            }
+
+            function pull_down(elem){
+                elem.parentNode.insertBefore(elem.nextSibling, elem);
+            }
+
+
+            function pull_up(elem){
+                elem.parentNode.insertBefore(elem, elem.previousSibling);
+            }
+
+            $('#specialities').on('click', '.data-formset-down-button', function(){
+                pull_down($(this).parent()[0]);
+            });
+
+            $('#specialities').on('click', '.data-formset-up-button', function(){
+                pull_up($(this).parent()[0]);
+            });
         });
     </script>
 
@@ -172,17 +133,71 @@
         padding: 20px;
     }
 
-    a.data-formset-delete-button{
-        color: red;
+    a.formset-button{
+        font-size: 28pt;
         cursor: pointer;
+        position: absolute;
+        text-align: center;
     }
+
+    a.data-formset-delete-button{
+        color: #D16165;
+        top: 20px;
+        right: 20px;
+    }
+
+    a.data-formset-up-button{
+        color: green;
+        top: 80px;
+        right: 20px;
+    }
+
+    a.data-formset-down-button{
+        color: green;
+        top: 140px;
+        right: 17px;
+    }
+
+    .data-formset-form:first-child .data-formset-up-button{
+        display: none;
+    }
+    .data-formset-form:first-child .data-formset-down-button{
+        top: 80px;
+    }
+    .data-formset-form:last-child .data-formset-down-button{
+        display: none;
+    }
+    .data-formset-form:last-child .data-formset-up-button{
+        top: 80px;
+    }
+
 
     label.common-form-label:after{
         content: ':';
     }
 
+    label.common-form-label{
+        font-weight: 400;
+    }
+
     input[type=text].error{
         border-color: red;
+    }
+
+    .form-control{
+        max-width:400px;
+    }
+
+    .form-group{
+        clear: both;
+        margin-bottom: 10px;
+    }
+
+    .data-formset-form{
+        border: 1px solid rgb(128, 128, 128);
+        margin-bottom: 15px;
+        padding: 15px;
+        position: relative;
     }
 </style>
 {% endblock %}

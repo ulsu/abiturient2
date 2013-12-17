@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.forms import ModelForm
-from django.forms.widgets import RadioSelect
+from django.forms.widgets import RadioSelect, TextInput, Select, DateInput
 from django.forms.models import inlineformset_factory, modelformset_factory
 
 from kladr.models import *
 from kladr.forms import FormKLADRRelatesMixin
 
 from models import Application, Exam
-from widgets import ChainedSelectWidget, ChainedTextWidget
+from widgets import ChainedSelectWidget, ChainedTextWidget, SelectWidget
 
 disabled = {'disabled': 'disabled'}
 
@@ -24,7 +24,9 @@ class DependentFormMixin(object):
             self.fields[f].widget.attrs.update({
                 'data-dependent-field': parent_id,
                 'data-dependent-value': str(value),
-                'class': 'dependent'
+                'class': '%s %s' % (self.fields[f].widget.attrs['class'], 'dependent')
+                if 'class' in self.fields[f].widget.attrs
+                else 'dependent'
             })
             value_is_forbidden = parent is None or\
                                  (value == '' and parent == '') or\
@@ -74,6 +76,8 @@ class PersonalApplicationForm(ModelForm, DependentFormMixin):
         super(PersonalApplicationForm, self).__init__(*args, **kwargs)
         for f in self.fields:
             self.fields[f].empty_label = ''
+            if type(self.fields[f].widget) in (TextInput, Select, DateInput, SelectWidget):
+                self.fields[f].widget.attrs.update({'class':'form-control'})
 
         citizenship_russia_data = {
             'parent': self.instance.Citizenship,
@@ -124,11 +128,14 @@ class ResidenceApplicationForm(ModelForm, DependentFormMixin, FormKLADRRelatesMi
         super(ResidenceApplicationForm, self).__init__(*args, **kwargs)
         for f in self.fields:
             self.fields[f].empty_label = ''
+            if type(self.fields[f].widget) in (TextInput, Select, DateInput, SelectWidget, ChainedTextWidget, ChainedSelectWidget):
+                self.fields[f].widget.attrs.update({'class':'form-control'})
 
         # КЛАДРовые связи регионов, районов, городов и улиц
-        self._prepare_KLADR_form_relation('RegDistrict', self.instance.RegRegion, District)
-        self._prepare_KLADR_form_relation('RegCity', self.instance.RegDistrict, City)
-        self._prepare_KLADR_form_relation('RegStreet', self.instance.RegCity, Street)
+        if self.instance:
+            self._prepare_KLADR_form_relation('RegDistrict', self.instance.RegRegion, District)
+            self._prepare_KLADR_form_relation('RegCity', self.instance.RegDistrict, City)
+            self._prepare_KLADR_form_relation('RegStreet', self.instance.RegCity, Street)
 
         # Улицы только города Ульяновска
         # TODO: Вынести id Ульяновска в КЛАДРе в настройки
@@ -164,5 +171,7 @@ class ExamForm(ModelForm):
         super(ExamForm, self).__init__(*args, **kwargs)
         for f in self.fields:
             self.fields[f].empty_label = ''
+            if type(self.fields[f].widget) in (TextInput, Select, DateInput, SelectWidget, ChainedTextWidget, ChainedSelectWidget):
+                self.fields[f].widget.attrs.update({'class':'form-control'})
 
 ExamFormSet = inlineformset_factory(Application, Exam, form=ExamForm, extra=1, max_num=5)
