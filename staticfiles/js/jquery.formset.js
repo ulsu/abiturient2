@@ -22,8 +22,11 @@
         emptyForm: "script[type=form-template][data-formset-empty-form]",
         body: "[data-formset-body]",
         add: "[data-formset-add]",
-        deleteButton: "[data-formset-delete-button]"
+        deleteButton: "[data-formset-delete-button]",
+        upButton: "[data-formset-up-button]",
+        downButton: "[data-formset-down-button]"
     };
+
     n.prototype.addForm = function () {
         var t = this.formCount();
         this.formCount(t + 1);
@@ -32,29 +35,93 @@
         this.$body.append(r);
         this.bindForm(r, t);
         r.slideUp(0);
+        this.renderControls(this);
+        r.addClass('display');
         r.toggle();
         bind_stuff();
-        console.log('binded');
         return r
     };
-    n.prototype.bindForm = function (e, n) {
-        var r = this.formsetPrefix + "-" + n;
-        e.data(t + "__formPrefix", r);
-        var i = e.find("[name=" + r + "-DELETE]");
-        var s = e.find(this.opts.deleteButton);
-        if (s.length) {
-            s.bind("click", function () {
-                e.toggle();
-                i.attr("checked", true)
-            });
-            if (i.is(":checked")) {
-                e.slideUp(0)
+
+
+    n.prototype.renderControls = function(form) {
+        var items = form.$body.children('.display');
+        var up, down;
+        console.log('qwqw');
+        for (var i=0; i<items.length; i++){
+            up = $(items[i]).find(form.opts.upButton);
+            down = $(items[i]).find(form.opts.downButton);
+            if (up.length && down.length){
+                if (items.length == 1){
+                    up.css('display', 'none');
+                    down.css('display', 'none');
+                } else {
+                    switch (i){
+                        case 0:
+                            $(items[i]).addClass('first');
+                            $(items[i]).removeClass('last');
+                            break;
+                        case items.length-1:
+                            $(items[i]).addClass('last');
+                            $(items[i]).removeClass('first');
+                            break;
+                        default:
+                            up.css('display', '');
+                            down.css('display', '');
+                            break;
+                    }
+                }
             }
         }
     };
+
+
+    n.prototype.bindForm = function (e, n) {
+        var renderControls = this.renderControls;
+        var form = this;
+
+        var r = this.formsetPrefix + "-" + n;
+        e.data(t + "__formPrefix", r);
+        var s = e.find(this.opts.deleteButton);
+        if (s.length) {
+            var i = e.find("[name=" + r + "-DELETE]");
+            s.bind("click", function () {
+                e.removeClass('display');
+                e.addClass('hidden');
+                i.attr("checked", true);
+                renderControls(form);
+            });
+            if (i.is(":checked")) {
+                e.slideUp(0);
+                renderControls(form);
+            }
+        }
+
+
+
+        s = e.find(this.opts.upButton);
+        if (s.length) {
+            s.bind("click", function () {
+                var el = e[0];
+                el.parentNode.insertBefore(el, el.previousSibling);
+                renderControls(form);
+            });
+        }
+
+        s = e.find(this.opts.downButton);
+        if (s.length) {
+            s.bind("click", function () {
+                var el = e[0];
+                el.parentNode.insertBefore(el.nextSibling, el);
+                renderControls(form);
+            });
+        }
+        this.renderControls(this);
+    };
+
     n.prototype.managementForm = function (e) {
         return this.$formset.find("[name=" + this.formsetPrefix + "-" + e + "]")
     };
+
     n.prototype.formCount = function () {
         var e = this.managementForm("TOTAL_FORMS");
         if (arguments.length) {
@@ -64,6 +131,7 @@
             return parseInt(e.val(), 10) || 0
         }
     };
+
     n.getOrCreate = function (r, i) {
         var s = e(r).data(t);
         if (!s) {
@@ -71,6 +139,7 @@
         }
         return s
     };
+
     e.fn[t] = function () {
         var t, r, i;
         if (arguments.length === 0 || arguments.length === 1 && e.type(arguments[0]) != "string") {
@@ -88,4 +157,4 @@
             throw new Error("Unknown function call " + r + " for $.fn.formset")
         }
     }
-})(jQuery)
+})(jQuery);

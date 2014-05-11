@@ -9,9 +9,58 @@
             max-width: 800px;
             margin: 50px auto 0;
         }
+
+        #header{
+            width: 1074px;
+            margin: 0 auto;
+            color: #fff;
+        }
+
+        #main_container{
+            background-color: #00af80;
+        }
+
+        #main_container.passive_state{
+            height:  54px;
+        }
+
+        #passive_header_row{
+            line-height: 50px;
+            margin: 0 20px 0 20px;
+        }
+
+        #passive_title{
+            float: left;
+            margin-left: 50px;
+        }
+
+        #passive_nubmer{
+            float: left;
+            margin-left: 250px;
+        }
+
+        #passive_personal{
+            float: right;
+            margin-right: 75px;
+        }
+
+        #navigation{
+            background-color: #d98205;
+            height: 35px;
+            width: 1024px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-top: -7px;
+        }
+
+        #navigation ul li{
+            float: left;
+            margin-right: 30px;
+        }
     </style>
 </head>
 <body>
+
 <div id="main_content" class="container">
     {% block content %}{% endblock %}
 </div>

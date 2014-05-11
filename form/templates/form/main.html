@@ -82,36 +82,6 @@
                 var display = this.checked;
                 $('#residence-block').css('display',((display)?'none':'block'));
             });
-
-            function swapElements(elm1, elm2) {
-                var parent1, next1,
-                        parent2, next2;
-
-                parent1 = elm1.parentNode;
-                next1   = elm1.nextSibling;
-                parent2 = elm2.parentNode;
-                next2   = elm2.nextSibling;
-
-                parent1.insertBefore(elm2, next1);
-                parent2.insertBefore(elm1, next2);
-            }
-
-            function pull_down(elem){
-                elem.parentNode.insertBefore(elem.nextSibling, elem);
-            }
-
-
-            function pull_up(elem){
-                elem.parentNode.insertBefore(elem, elem.previousSibling);
-            }
-
-            $('#specialities').on('click', '.data-formset-down-button', function(){
-                pull_down($(this).parent()[0]);
-            });
-
-            $('#specialities').on('click', '.data-formset-up-button', function(){
-                pull_up($(this).parent()[0]);
-            });
         });
     </script>
 
@@ -158,17 +128,20 @@
         right: 17px;
     }
 
-    .data-formset-form:first-child .data-formset-up-button{
+    .data-formset-form.display.first .data-formset-down-button{
+        top: 80px;
+        display: block;
+    }
+    .data-formset-form.display.first .data-formset-up-button{
         display: none;
     }
-    .data-formset-form:first-child .data-formset-down-button{
+
+    .data-formset-form.display.last .data-formset-up-button{
         top: 80px;
+        display: block;
     }
-    .data-formset-form:last-child .data-formset-down-button{
+    .data-formset-form.display.last .data-formset-down-button{
         display: none;
-    }
-    .data-formset-form:last-child .data-formset-up-button{
-        top: 80px;
     }
 
 
