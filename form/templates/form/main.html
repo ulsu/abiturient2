@@ -11,9 +11,31 @@
     <div class="tab-content">
         <div class="tab-pane active" id="personal">
             <h2>Персональная информация</h2>
-            {% for input in personal_form %}
-                {% include 'form/form-group.html' %}
-            {% endfor %}
+            {% with input=personal_form.LastName %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.FirstName %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.MiddleName %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.BirthDay %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.BirthPlace %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.IDSex %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.IDSocialStatus %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.Nationality %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=personal_form.Citizenship %}{% include 'form/form-group.html' %}{% endwith %}
+
+            <div id="citizenship-russia-block" {% if not personal_form.Citizenship.value or personal_form.Citizenship.value != 1 %} style="display:none;"{% endif %}>
+                {% with input=personal_form.PassportSer %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=personal_form.PassportNumb %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=personal_form.CodUVD %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=personal_form.PassportDate %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=personal_form.PassportIssued %}{% include 'form/form-group.html' %}{% endwith %}
+            </div>
+
+            <div id="citizenship-not-russia-block" {% if not personal_form.Citizenship.value or personal_form.Citizenship.value == 1 %} style="display:none;"{% endif %}>
+                {% with input=personal_form.ForeignPassportSer %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=personal_form.ForeignPassportNumb %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=personal_form.ForeignPassportDate %}{% include 'form/form-group.html' %}{% endwith %}
+                {% with input=personal_form.ForeignPassportIssued %}{% include 'form/form-group.html' %}{% endwith %}
+            </div>
+
         </div>
         <div class="tab-pane" id="registration">
             <h2>Место жительства</h2>
@@ -47,6 +69,11 @@
             {% with formset=exam_formset formset_id='exam_formset' formset_template='form/exam_formset_item.html' %}
                 {% include 'form/formset-container.html' %}
             {% endwith %}
+            <h3>Школьный аттестат</h3>
+            {% with input=certificate_form.Fives %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=certificate_form.Fours %}{% include 'form/form-group.html' %}{% endwith %}
+            {% with input=certificate_form.Threes %}{% include 'form/form-group.html' %}{% endwith %}
+            <p>Средний балл: <span id="certificate_mean">0</span></p>
         </div>
         <div class="tab-pane" id="specialities">
             <h2>Специальности</h2>
@@ -64,9 +91,6 @@
 {% endblock %}
 
 {% block js %}
-    <script>
-
-    </script>
 
     <script src="{{ STATIC_URL }}js/jstorage.min.js"></script>
     <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
@@ -82,6 +106,31 @@
                 var display = this.checked;
                 $('#residence-block').css('display',((display)?'none':'block'));
             });
+
+            $('#id_Citizenship').on('change', function(){
+                var selected = !!this.value;
+                var russia = this.value == 1;
+                $('#citizenship-russia-block').css('display',((selected && russia)?'block':'none'));
+                $('#citizenship-not-russia-block').css('display',((selected && !russia)?'block':'none'));
+            });
+
+            $('#id_Fives, #id_Fours, #id_Threes').on('change keyup', function(){
+                calculate_certificate_mean();
+            });
+
+            function calculate_certificate_mean(){
+                var fives = parseInt($('#id_Fives').val());
+                var fours = parseInt($('#id_Fours').val());
+                var threes = parseInt($('#id_Threes').val());
+                var mean = 0;
+
+                if (fives+fours+threes != 0)
+                    mean = (fives*5+fours*4+threes*3)/(fives+fours+threes);
+                else mean = 0;
+                $('#certificate_mean').html(mean.toFixed(1));
+            }
+
+            calculate_certificate_mean();
         });
     </script>
 

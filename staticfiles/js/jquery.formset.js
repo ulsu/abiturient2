@@ -24,11 +24,15 @@
         add: "[data-formset-add]",
         deleteButton: "[data-formset-delete-button]",
         upButton: "[data-formset-up-button]",
-        downButton: "[data-formset-down-button]"
+        downButton: "[data-formset-down-button]",
+        order: "[data-formset-order]"
     };
 
     n.prototype.addForm = function () {
         var t = this.formCount();
+
+        if (this.getActiveFormsCount() >= this.getMaxForms())
+            return false;
         this.formCount(t + 1);
         var n = this.$emptyForm.html().replace(new RegExp("__prefix__", "g"), t).replace(new RegExp("<\\\\/script>", "g"), "</script>");
         var r = e(n);
@@ -39,17 +43,22 @@
         r.addClass('display');
         r.toggle();
         bind_stuff();
+        console.log(r.previousSibling);
+        while (r.previousSibling){
+            r.parentNode.insertBefore(r, r.previousSibling);
+        }
         return r
     };
 
 
     n.prototype.renderControls = function(form) {
         var items = form.$body.children('.display');
-        var up, down;
-        console.log('qwqw');
+        var up, down, order;
         for (var i=0; i<items.length; i++){
             up = $(items[i]).find(form.opts.upButton);
             down = $(items[i]).find(form.opts.downButton);
+            order = $(items[i]).find(form.opts.order);
+            order.val(i+1);
             if (up.length && down.length){
                 if (items.length == 1){
                     up.css('display', 'none');
@@ -65,8 +74,8 @@
                             $(items[i]).removeClass('first');
                             break;
                         default:
-                            up.css('display', '');
-                            down.css('display', '');
+                            $(items[i]).removeClass('first');
+                            $(items[i]).removeClass('last');
                             break;
                     }
                 }
@@ -87,6 +96,10 @@
             s.bind("click", function () {
                 e.removeClass('display');
                 e.addClass('hidden');
+                var el = e[0];
+                while (el.nextSibling) {
+                    el.parentNode.insertBefore(el.nextSibling, el);
+                }
                 i.attr("checked", true);
                 renderControls(form);
             });
@@ -130,6 +143,15 @@
         } else {
             return parseInt(e.val(), 10) || 0
         }
+    };
+
+    n.prototype.getActiveFormsCount = function () {
+        return this.$body.children('.display').length;
+    };
+
+    n.prototype.getMaxForms = function () {
+        var e = this.managementForm("MAX_NUM_FORMS");
+        return parseInt(e.val(), 10) || 0
     };
 
     n.getOrCreate = function (r, i) {

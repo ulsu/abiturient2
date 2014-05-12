@@ -74,6 +74,13 @@ class Application(models.Model):
     BirthPlace      = models.CharField(max_length=255,  blank=True, verbose_name='Место рождения')
     PassportIssued  = models.CharField(max_length=255,  blank=True, verbose_name='Паспорт выдан')
 
+    #Паспортные данные иностранного гражданина
+    ForeignPassportSer    = models.CharField(max_length=255, blank=True, null=True, verbose_name='Серия паспорта')
+    ForeignPassportNumb   = models.CharField(max_length=255, blank=True, null=True, verbose_name='Номер паспорта')
+    ForeignPassportDate   = models.DateField(                 blank=True, null=True, verbose_name='Дата выдачи паспорта')
+    ForeignBirthPlace     = models.CharField(max_length=255,  blank=True, verbose_name='Место рождения')
+    ForeignPassportIssued = models.CharField(max_length=255,  blank=True, verbose_name='Паспорт выдан')
+
 
     RegCountry = models.ForeignKey(Country, blank=True, null=True, verbose_name='Страна')
     RegRegion = models.ForeignKey(Region, blank=True, null=True, verbose_name='Регион')
@@ -92,13 +99,20 @@ class Application(models.Model):
     ResApartment = models.CharField(max_length=255, blank=True, null=True, verbose_name='Квартира')
     ResZipcode = models.IntegerField(max_length=6, blank=True, null=True, verbose_name='Почтовый индекс')
 
+    Fives  = models.IntegerField(verbose_name='количество пятёрок', default=0)
+    Fours  = models.IntegerField(verbose_name='количество четвёрок', default=0)
+    Threes = models.IntegerField(verbose_name='количество троек', default=0)
+
     def __unicode__(self):
         return "%s %s %s" % (self.LastName, self.FirstName, self.MiddleName)
 
+    def certificate_mean(self):
+        return (self.Fives * 5 + self.Fours * 4 + self.Threes * 3)/(self.Fives + self.Fours + self.Threes)
 
 
 class ExamName(models.Model, UnicodeIsNameMixin):
     name = models.CharField(max_length=255)
+
 
 class Exam(models.Model):
     Number   = models.CharField(max_length=20, blank=True, verbose_name='Номер свидетельства ЕГЭ')

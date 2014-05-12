@@ -7,14 +7,18 @@ class UnicodeIsName(object):
     def __unicode__(self):
         return self.name
 
+
 class Direction(models.Model, UnicodeIsName):
     name = models.CharField(max_length=255, verbose_name='название')
+
     class Meta:
         verbose_name = 'направление'
         verbose_name_plural = 'направления'
 
+
 class Stream(models.Model, UnicodeIsName):
     name = models.CharField(max_length=255, verbose_name='название')
+
     class Meta:
         verbose_name = 'поток'
         verbose_name_plural = 'потоки'
@@ -22,6 +26,7 @@ class Stream(models.Model, UnicodeIsName):
 
 class Faculty(models.Model, UnicodeIsName):
     name = models.CharField(max_length=255, verbose_name='название')
+
     class Meta:
         verbose_name = 'факультет'
         verbose_name_plural = 'факультеты'
@@ -29,6 +34,7 @@ class Faculty(models.Model, UnicodeIsName):
 
 class EducationForm(models.Model, UnicodeIsName):
     name = models.CharField(max_length=255, verbose_name='название')
+
     class Meta:
         verbose_name = 'форма обучения'
         verbose_name_plural = 'формы обучения'
@@ -36,6 +42,7 @@ class EducationForm(models.Model, UnicodeIsName):
 
 class Exam(models.Model, UnicodeIsName):
     name = models.CharField(max_length=255, verbose_name='название')
+
     class Meta:
         verbose_name = 'экзамен'
         verbose_name_plural = 'экзамены'
@@ -67,7 +74,7 @@ class SpecialityItem(models.Model):
         return self.education_form.name
 
     def get_full_name(self):
-        return '%s - %s' % (self.speciality.name, self.education_form.name)
+        return '%s - %s' % (self.speciality.faculty.name, self.education_form.name)
 
     class Meta:
         verbose_name = 'форма обучения'
@@ -82,3 +89,6 @@ class EducationItem(models.Model):
     education_form = models.ManyToManyField(SpecialityItem, verbose_name='формы обучения', null=True, blank=True)
     stream = models.ForeignKey(Stream, verbose_name='поток', null=True, blank=True)
     order = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['order',]

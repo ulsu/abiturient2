@@ -3,6 +3,7 @@
     {% with input=form.faculty %}{% include 'form/form-group.html' %}{% endwith %}
     {% with input=form.education_form %}{% include 'form/form-group.html' %}{% endwith %}
     {% with input=form.stream %}{% include 'form/form-group.html' %}{% endwith %}
+    {{ form.order }}
     {{ form.id }}
     <span class="hidden">{{ form.DELETE }}</span>
     <a data-formset-delete-button class="data-formset-delete-button formset-button"><span class="glyphicon glyphicon-remove"></span></a>

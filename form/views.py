@@ -10,20 +10,24 @@ from education.forms import EducationFormSet
 def get_forms(kwargs):
     return {
         'personal_form': PersonalApplicationForm(**kwargs),
-        'residence_form': ResidenceApplicationForm(**kwargs)
+        'residence_form': ResidenceApplicationForm(**kwargs),
+        'certificate_form': CertificateForm(**kwargs),
     }
+
 
 def get_formsets(kwargs):
     return {
         'exam_formset': ExamFormSet(**kwargs),
-        'edu_formset': EducationFormSet(**kwargs)
+        'edu_formset': EducationFormSet(**kwargs),
     }
+
 
 def are_valid(forms):
     for f in forms:
         if not forms[f].is_valid():
             return False
     return True
+
 
 def app_list(request):
     applications = Application.objects.all()
@@ -36,6 +40,7 @@ def render_form(request, context):
     t = loader.get_template('form/main.html')
     c = RequestContext(request, context)
     return HttpResponse(t.render(c))
+
 
 def get_instance_and_url(request, id):
     if id is None:

@@ -11,6 +11,7 @@ from widgets import ChainedSelectWidget, ChainedTextWidget, SelectWidget
 
 disabled = {'disabled': 'disabled'}
 
+
 def get_object_or_none(model, *args, **kwargs):
     try:
         return model.objects.get(*args, **kwargs)
@@ -40,7 +41,6 @@ class DependentFormMixin(object):
             #
             # self.__setattr__('clean_%s' % f, field_clean_template)
 
-
     def field_cleaner(self, field_name, parent_field_name, model, parent_model):
         if field_name in self._errors:
             elem = model.objects.get(pk=self.data[field_name])
@@ -69,8 +69,9 @@ class PersonalApplicationForm(ModelForm, DependentFormMixin):
             'IDSex': RadioSelect()
         }
         fields = ['LastName', 'FirstName', 'MiddleName', 'BirthDay', 'BirthPlace', 'IDSex',
-                  'IDSocialStatus', 'Nationality', 'Citizenship', 'PassportSer',
-                  'PassportNumb', 'CodUVD', 'PassportDate', 'PassportIssued']
+                  'IDSocialStatus', 'Nationality', 'Citizenship',
+                  'PassportSer', 'PassportNumb', 'CodUVD', 'PassportDate', 'PassportIssued',
+                  'ForeignPassportSer', 'ForeignPassportNumb', 'ForeignPassportDate', 'ForeignPassportIssued']
 
     def __init__(self, *args, **kwargs):
         super(PersonalApplicationForm, self).__init__(*args, **kwargs)
@@ -79,20 +80,19 @@ class PersonalApplicationForm(ModelForm, DependentFormMixin):
             if type(self.fields[f].widget) in (TextInput, Select, DateInput, SelectWidget):
                 self.fields[f].widget.attrs.update({'class':'form-control'})
 
-        citizenship_russia_data = {
-            'parent': self.instance.Citizenship,
-            'parent_id': 'id_Citizenship',
-            'value': 1
-        }
-        citizenship_dependent_fields = [
-            'PassportSer',
-            'PassportNumb',
-            'CodUVD',
-            'PassportDate',
-            'PassportIssued'
-        ]
-        self._prepare_dependent_fields(citizenship_dependent_fields, **citizenship_russia_data)
-
+        # citizenship_russia_data = {
+        #     'parent': self.instance.Citizenship,
+        #     'parent_id': 'id_Citizenship',
+        #     'value': 1
+        # }
+        # citizenship_dependent_fields = [
+        #     'PassportSer',
+        #     'PassportNumb',
+        #     'CodUVD',
+        #     'PassportDate',
+        #     'PassportIssued'
+        # ]
+        # self._prepare_dependent_fields(citizenship_dependent_fields, **citizenship_russia_data)
 
 
 class ResidenceApplicationForm(ModelForm, DependentFormMixin, FormKLADRRelatesMixin):
@@ -162,6 +162,7 @@ class ResidenceApplicationForm(ModelForm, DependentFormMixin, FormKLADRRelatesMi
             self.cleaned_data['ResZipcode'] = None
         return self.cleaned_data
 
+
 class ExamForm(ModelForm):
     class Meta:
         model = Exam
@@ -175,3 +176,17 @@ class ExamForm(ModelForm):
                 self.fields[f].widget.attrs.update({'class':'form-control'})
 
 ExamFormSet = inlineformset_factory(Application, Exam, form=ExamForm, extra=1, max_num=5)
+
+
+class CertificateForm(ModelForm):
+    class Meta:
+        model = Application
+        fields = ['Fives', 'Fours', 'Threes']
+
+    def __init__(self, *args, **kwargs):
+        super(CertificateForm, self).__init__(*args, **kwargs)
+        for f in self.fields:
+            self.fields[f].empty_label = ''
+            if type(self.fields[f].widget) in (TextInput, Select, DateInput, SelectWidget):
+                self.fields[f].widget.attrs.update({'class':'form-control'})
+

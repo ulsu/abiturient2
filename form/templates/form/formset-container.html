@@ -1,14 +1,12 @@
 <div id="{{ formset_id }}" class="entry" data-formset-prefix="{{ formset.prefix }}">
     {{ formset.management_form }}
     <div data-formset-body>
-        {% for form in formset.forms %}
-            {% include formset_template %}
-        {% endfor %}
+        {% for form in formset.forms %}{% include formset_template %}{% endfor %}
     </div>
     <script type="form-template" data-formset-empty-form>
         {% with form=formset.empty_form %}
             {% include formset_template %}
         {% endwith %}
     </script>
-    <input type="button" value="Add another" data-formset-add>
+    <input type="button" value="Добавить" data-formset-add>
 </div>
